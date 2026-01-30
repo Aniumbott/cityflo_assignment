@@ -1,0 +1,21 @@
+{
+  "name": "cityflo-invoice-system",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Cityflo Invoice Processing System - Monorepo",
+  "scripts": {
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "build:backend": "cd backend && npm run build",
+    "build:frontend": "cd frontend && npm run build",
+    "test:backend": "cd backend && npm test",
+    "install:all": "cd backend && npm install && cd ../frontend && npm install",
+    "prisma:migrate": "cd backend && npx dotenv -e ../.env -- npx prisma migrate dev",
+    "prisma:seed": "cd backend && npx dotenv -e ../.env -- npx tsx prisma/seed.ts",
+    "prisma:studio": "cd backend && npx dotenv -e ../.env -- npx prisma studio"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  }
+}

@@ -6,6 +6,9 @@ import rateLimit from 'express-rate-limit';
 import path from 'path';
 import fs from 'fs';
 import { config } from './config';
+import authRoutes from './routes/auth';
+import invoiceRoutes from './routes/invoices';
+import notificationRoutes from './routes/notifications';
 
 const app = express();
 
@@ -39,13 +42,23 @@ app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-// Routes will be added in Phase 2+
-// app.use('/api/auth', authRoutes);
-// app.use('/api/invoices', invoiceRoutes);
-// app.use('/api/notifications', notificationRoutes);
+// Routes
+app.use('/api/auth', authRoutes);
+app.use('/api/invoices', invoiceRoutes);
+app.use('/api/notifications', notificationRoutes);
 
 // Error handling middleware
 app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
+  // Handle Multer errors
+  if (err.message === 'Only PDF files are allowed') {
+    res.status(400).json({ error: err.message });
+    return;
+  }
+  if ((err as any).code === 'LIMIT_FILE_SIZE') {
+    res.status(400).json({ error: 'File size exceeds 10MB limit' });
+    return;
+  }
+
   console.error('Unhandled error:', err);
   res.status(500).json({
     error: 'Internal server error',

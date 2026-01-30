@@ -7,7 +7,12 @@
       "Bash(npm test:*)",
       "Bash(npm create:*)",
       "Bash(npx tsc:*)",
-      "Bash(npm run test:backend:*)"
+      "Bash(npm run test:backend:*)",
+      "Bash(npx dotenv:*)",
+      "Bash(npx tsx:*)",
+      "Bash(node -e:*)",
+      "Bash(npx jest --verbose)",
+      "Bash(npx jest:*)"
     ]
   }
 }

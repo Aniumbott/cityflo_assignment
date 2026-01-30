@@ -11,8 +11,8 @@ export const config = {
   databaseUrl: process.env.DATABASE_URL || '',
   jwtSecret: process.env.JWT_SECRET || 'dev-secret-change-me',
   jwtRefreshSecret: process.env.JWT_REFRESH_SECRET || 'dev-refresh-secret-change-me',
-  jwtExpiresIn: '15m',
-  jwtRefreshExpiresIn: '7d',
+  jwtExpiresIn: 900,          // 15 minutes in seconds
+  jwtRefreshExpiresIn: 604800, // 7 days in seconds
   geminiApiKey: process.env.GEMINI_API_KEY || '',
   uploadDir: process.env.UPLOAD_DIR || './uploads',
   frontendUrl: process.env.FRONTEND_URL || 'http://localhost:5173',

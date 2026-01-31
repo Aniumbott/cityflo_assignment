@@ -24,7 +24,16 @@
       "Bash(psql:*)",
       "Bash(render:*)",
       "Bash(npm run test)",
-      "Bash(npm run test:*)"
+      "Bash(npm run test:*)",
+      "Bash(python -m json.tool:*)",
+      "Bash(unzip:*)",
+      "Bash(chmod:*)",
+      "Bash(./render.exe services list:*)",
+      "Bash(./render.exe deploys list:*)",
+      "Bash(./render.exe logs:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)"
     ]
   }
 }

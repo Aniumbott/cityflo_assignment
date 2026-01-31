@@ -20,11 +20,13 @@ vi.mock('../api/invoices', () => ({
   updateInvoiceStatus: vi.fn(),
   editExtractedData: vi.fn(),
   getPdfUrl: vi.fn((id) => `/api/invoices/${id}/pdf`),
+  fetchPdfBlob: vi.fn(),
 }));
 
-import { getInvoice, updateInvoiceStatus } from '../api/invoices';
+import { getInvoice, updateInvoiceStatus, fetchPdfBlob } from '../api/invoices';
 const mockGetInvoice = vi.mocked(getInvoice);
 const mockUpdateStatus = vi.mocked(updateInvoiceStatus);
+const mockFetchPdfBlob = vi.mocked(fetchPdfBlob);
 
 // Fresh QueryClient per render to avoid cache pollution
 function renderWithProviders(ui: ReactElement) {
@@ -112,6 +114,8 @@ describe('InvoiceReviewPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     window.history.pushState({}, '', '/invoices/inv-1');
+    // Mock fetchPdfBlob to return a resolved Promise with a mock Blob
+    mockFetchPdfBlob.mockResolvedValue(new Blob(['mock pdf content'], { type: 'application/pdf' }));
   });
 
   it('renders loading state initially', () => {
@@ -161,7 +165,9 @@ describe('InvoiceReviewPage', () => {
     await waitFor(() => {
       const iframe = screen.getByTitle('Invoice PDF');
       expect(iframe).toBeInTheDocument();
-      expect(iframe).toHaveAttribute('src', '/api/invoices/inv-1/pdf');
+      // The component now fetches the PDF as a blob and creates an object URL
+      const src = iframe.getAttribute('src');
+      expect(src).toMatch(/^blob:/);
     });
   });
 

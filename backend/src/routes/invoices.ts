@@ -380,6 +380,7 @@ router.patch('/:id/status', authorize(UserRole.ACCOUNTS, UserRole.SENIOR_ACCOUNT
   const id = req.params.id as string;
   const invoice = await prisma.invoice.findUnique({
     where: { id },
+    include: { extractedData: true },
   });
 
   if (!invoice) {
@@ -387,45 +388,212 @@ router.patch('/:id/status', authorize(UserRole.ACCOUNTS, UserRole.SENIOR_ACCOUNT
     return;
   }
 
-  const statusMap: Record<string, InvoiceStatus> = {
-    APPROVED: InvoiceStatus.APPROVED,
-    REJECTED: InvoiceStatus.REJECTED,
-    PAID: InvoiceStatus.PAID,
-  };
+  const userRole = req.user!.role;
+  const userId = req.user!.userId;
 
-  const auditActionMap: Record<string, string> = {
-    APPROVED: 'APPROVED',
-    REJECTED: 'REJECTED',
-    PAID: 'MARKED_PAID',
-  };
+  // Handle rejection - can be done by either role at any stage
+  if (status === 'REJECTED') {
+    const updatedInvoice = await prisma.$transaction(async (tx) => {
+      const updated = await tx.invoice.update({
+        where: { id: invoice.id },
+        data: { status: InvoiceStatus.REJECTED },
+      });
 
-  const updatedInvoice = await prisma.$transaction(async (tx) => {
-    const updated = await tx.invoice.update({
-      where: { id: invoice.id },
-      data: { status: statusMap[status] },
+      await tx.invoiceAction.create({
+        data: {
+          invoiceId: invoice.id,
+          userId,
+          action: 'REJECTED',
+          comment: comment || null,
+        },
+      });
+
+      await tx.notification.create({
+        data: {
+          userId: invoice.submittedBy,
+          invoiceId: invoice.id,
+          message: `Your invoice ${invoice.originalFilename} has been rejected.`,
+        },
+      });
+
+      return updated;
     });
 
-    await tx.invoiceAction.create({
-      data: {
-        invoiceId: invoice.id,
-        userId: req.user!.userId,
-        action: auditActionMap[status] as any,
-        comment: comment || null,
-      },
+    res.json({ invoice: updatedInvoice });
+    return;
+  }
+
+  // Handle marking as PAID - only for already approved invoices
+  if (status === 'PAID') {
+    if (invoice.status !== InvoiceStatus.APPROVED) {
+      res.status(400).json({ error: 'Only approved invoices can be marked as paid' });
+      return;
+    }
+
+    const updatedInvoice = await prisma.$transaction(async (tx) => {
+      const updated = await tx.invoice.update({
+        where: { id: invoice.id },
+        data: { status: InvoiceStatus.PAID },
+      });
+
+      await tx.invoiceAction.create({
+        data: {
+          invoiceId: invoice.id,
+          userId,
+          action: 'MARKED_PAID',
+          comment: comment || null,
+        },
+      });
+
+      await tx.notification.create({
+        data: {
+          userId: invoice.submittedBy,
+          invoiceId: invoice.id,
+          message: `Your invoice ${invoice.originalFilename} has been marked as paid.`,
+        },
+      });
+
+      return updated;
     });
 
-    await tx.notification.create({
-      data: {
-        userId: invoice.submittedBy,
-        invoiceId: invoice.id,
-        message: `Your invoice ${invoice.originalFilename} has been ${status.toLowerCase()}.`,
-      },
+    res.json({ invoice: updatedInvoice });
+    return;
+  }
+
+  // Handle APPROVED - two-level workflow if required
+  if (invoice.requiresTwoLevel) {
+    // Two-level approval workflow
+    if (invoice.status === InvoiceStatus.PENDING_SENIOR_APPROVAL) {
+      // First level - must be SENIOR_ACCOUNTS
+      if (userRole !== UserRole.SENIOR_ACCOUNTS) {
+        res.status(403).json({ error: 'Only senior accountants can give first-level approval for high-value invoices' });
+        return;
+      }
+
+      const updatedInvoice = await prisma.$transaction(async (tx) => {
+        const updated = await tx.invoice.update({
+          where: { id: invoice.id },
+          data: {
+            status: InvoiceStatus.PENDING_FINAL_APPROVAL,
+            seniorApprovedBy: userId,
+            seniorApprovedAt: new Date(),
+          },
+        });
+
+        await tx.invoiceAction.create({
+          data: {
+            invoiceId: invoice.id,
+            userId,
+            action: 'APPROVED',
+            comment: comment || 'First-level approval (senior)',
+          },
+        });
+
+        // Notify submitter
+        await tx.notification.create({
+          data: {
+            userId: invoice.submittedBy,
+            invoiceId: invoice.id,
+            message: `Your invoice ${invoice.originalFilename} has received senior approval. Awaiting final approval.`,
+          },
+        });
+
+        // Notify ACCOUNTS users for final approval
+        const accountsUsers = await tx.user.findMany({
+          where: { role: UserRole.ACCOUNTS },
+        });
+
+        for (const accountsUser of accountsUsers) {
+          await tx.notification.create({
+            data: {
+              userId: accountsUser.id,
+              invoiceId: invoice.id,
+              message: `Invoice ${invoice.originalFilename} requires final approval.`,
+            },
+          });
+        }
+
+        return updated;
+      });
+
+      res.json({ invoice: updatedInvoice });
+      return;
+    }
+
+    if (invoice.status === InvoiceStatus.PENDING_FINAL_APPROVAL) {
+      // Second level - must be ACCOUNTS
+      if (userRole !== UserRole.ACCOUNTS) {
+        res.status(403).json({ error: 'Only accountants can give final approval for high-value invoices' });
+        return;
+      }
+
+      const updatedInvoice = await prisma.$transaction(async (tx) => {
+        const updated = await tx.invoice.update({
+          where: { id: invoice.id },
+          data: { status: InvoiceStatus.APPROVED },
+        });
+
+        await tx.invoiceAction.create({
+          data: {
+            invoiceId: invoice.id,
+            userId,
+            action: 'APPROVED',
+            comment: comment || 'Final approval',
+          },
+        });
+
+        await tx.notification.create({
+          data: {
+            userId: invoice.submittedBy,
+            invoiceId: invoice.id,
+            message: `Your invoice ${invoice.originalFilename} has been fully approved.`,
+          },
+        });
+
+        return updated;
+      });
+
+      res.json({ invoice: updatedInvoice });
+      return;
+    }
+  } else {
+    // Single-level approval - either role can approve
+    if (invoice.status !== InvoiceStatus.PENDING_REVIEW) {
+      res.status(400).json({ error: 'Invoice is not pending review' });
+      return;
+    }
+
+    const updatedInvoice = await prisma.$transaction(async (tx) => {
+      const updated = await tx.invoice.update({
+        where: { id: invoice.id },
+        data: { status: InvoiceStatus.APPROVED },
+      });
+
+      await tx.invoiceAction.create({
+        data: {
+          invoiceId: invoice.id,
+          userId,
+          action: 'APPROVED',
+          comment: comment || null,
+        },
+      });
+
+      await tx.notification.create({
+        data: {
+          userId: invoice.submittedBy,
+          invoiceId: invoice.id,
+          message: `Your invoice ${invoice.originalFilename} has been approved.`,
+        },
+      });
+
+      return updated;
     });
 
-    return updated;
-  });
+    res.json({ invoice: updatedInvoice });
+    return;
+  }
 
-  res.json({ invoice: updatedInvoice });
+  res.status(400).json({ error: 'Invalid invoice status for approval' });
 });
 
 // Helper: build Prisma where clause from query params

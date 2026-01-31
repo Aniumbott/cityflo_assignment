@@ -25,6 +25,8 @@ enum InvoiceCategory {
 
 enum InvoiceStatus {
   PENDING_REVIEW
+  PENDING_SENIOR_APPROVAL  // For high-value invoices awaiting senior approval
+  PENDING_FINAL_APPROVAL   // For high-value invoices awaiting final approval after senior
   APPROVED
   REJECTED
   PAID
@@ -62,18 +64,21 @@ model User {
 }
 
 model Invoice {
-  id               String           @id @default(uuid())
-  submittedBy      String           @map("submitted_by")
-  category         InvoiceCategory
-  status           InvoiceStatus    @default(PENDING_REVIEW)
-  notes            String?
-  filePath         String           @map("file_path")
-  originalFilename String           @map("original_filename")
-  extractionStatus ExtractionStatus @default(PENDING)
-  isDuplicate      Boolean          @default(false) @map("is_duplicate")
-  duplicateOf      String?          @map("duplicate_of")
-  createdAt        DateTime         @default(now()) @map("created_at")
-  updatedAt        DateTime         @updatedAt @map("updated_at")
+  id                  String           @id @default(uuid())
+  submittedBy         String           @map("submitted_by")
+  category            InvoiceCategory
+  status              InvoiceStatus    @default(PENDING_REVIEW)
+  notes               String?
+  filePath            String           @map("file_path")
+  originalFilename    String           @map("original_filename")
+  extractionStatus    ExtractionStatus @default(PENDING)
+  isDuplicate         Boolean          @default(false) @map("is_duplicate")
+  duplicateOf         String?          @map("duplicate_of")
+  seniorApprovedBy    String?          @map("senior_approved_by")
+  seniorApprovedAt    DateTime?        @map("senior_approved_at")
+  requiresTwoLevel    Boolean          @default(false) @map("requires_two_level")
+  createdAt           DateTime         @default(now()) @map("created_at")
+  updatedAt           DateTime         @updatedAt @map("updated_at")
 
   submitter     User            @relation(fields: [submittedBy], references: [id])
   extractedData ExtractedData?

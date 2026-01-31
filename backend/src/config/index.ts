@@ -17,4 +17,6 @@ export const config = {
   uploadDir: process.env.UPLOAD_DIR || './uploads',
   frontendUrl: process.env.FRONTEND_URL || 'http://localhost:5173',
   nodeEnv: process.env.NODE_ENV || 'development',
+  // Approval threshold - invoices >= this amount require two-level approval
+  twoLevelApprovalThreshold: parseFloat(process.env.TWO_LEVEL_APPROVAL_THRESHOLD || '50000'),
 };

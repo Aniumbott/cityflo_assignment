@@ -51,10 +51,19 @@ export async function processInvoiceExtraction(invoiceId: string): Promise<void>
         });
       }
 
-      // Mark as completed
+      // Check if two-level approval is required based on amount
+      const grandTotal = result.grandTotal ? parseFloat(result.grandTotal.toString()) : 0;
+      const requiresTwoLevel = grandTotal >= config.twoLevelApprovalThreshold;
+      const newStatus = requiresTwoLevel ? 'PENDING_SENIOR_APPROVAL' : 'PENDING_REVIEW';
+
+      // Mark as completed and update approval requirements
       await tx.invoice.update({
         where: { id: invoiceId },
-        data: { extractionStatus: 'COMPLETED' },
+        data: {
+          extractionStatus: 'COMPLETED',
+          requiresTwoLevel,
+          status: newStatus,
+        },
       });
     });
 
@@ -75,24 +84,49 @@ export async function processInvoiceExtraction(invoiceId: string): Promise<void>
 
 /**
  * Check if this invoice is a duplicate by matching invoice_number + vendor_name
- * against other invoices.
+ * against other invoices. If invoice_number is missing, falls back to matching
+ * vendor_name + grand_total + invoice_date as a secondary check.
  */
 async function detectDuplicate(invoiceId: string): Promise<void> {
   const extractedData = await prisma.extractedData.findUnique({
     where: { invoiceId },
   });
 
-  if (!extractedData?.invoiceNumber || !extractedData?.vendorName) {
-    return; // Can't detect duplicates without both fields
+  if (!extractedData) {
+    return; // No extracted data available
   }
 
-  const duplicate = await prisma.extractedData.findFirst({
-    where: {
-      invoiceNumber: extractedData.invoiceNumber,
+  let duplicate = null;
+
+  // Primary strategy: Match by vendor name + invoice number
+  if (extractedData.invoiceNumber && extractedData.vendorName) {
+    duplicate = await prisma.extractedData.findFirst({
+      where: {
+        invoiceNumber: extractedData.invoiceNumber,
+        vendorName: extractedData.vendorName,
+        invoiceId: { not: invoiceId }, // Exclude self
+      },
+    });
+  }
+
+  // Fallback strategy: If no invoice number, match by vendor + amount (+ date if available)
+  // This helps catch duplicate scanned receipts or informal invoices
+  if (!duplicate && extractedData.vendorName && extractedData.grandTotal) {
+    const fallbackWhere: any = {
       vendorName: extractedData.vendorName,
+      grandTotal: extractedData.grandTotal,
       invoiceId: { not: invoiceId }, // Exclude self
-    },
-  });
+    };
+
+    // Include date in matching if available (more precise)
+    if (extractedData.invoiceDate) {
+      fallbackWhere.invoiceDate = extractedData.invoiceDate;
+    }
+
+    duplicate = await prisma.extractedData.findFirst({
+      where: fallbackWhere,
+    });
+  }
 
   if (duplicate) {
     await prisma.invoice.update({

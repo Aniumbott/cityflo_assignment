@@ -28,7 +28,7 @@ export interface MeResponse {
 
 // Invoice types
 export type InvoiceCategory = 'VENDOR_PAYMENT' | 'REIMBURSEMENT';
-export type InvoiceStatus = 'PENDING_REVIEW' | 'APPROVED' | 'REJECTED' | 'PAID';
+export type InvoiceStatus = 'PENDING_REVIEW' | 'PENDING_SENIOR_APPROVAL' | 'PENDING_FINAL_APPROVAL' | 'APPROVED' | 'REJECTED' | 'PAID';
 export type ExtractionStatus = 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED';
 
 export interface Invoice {
@@ -42,6 +42,9 @@ export interface Invoice {
   extractionStatus: ExtractionStatus;
   isDuplicate: boolean;
   duplicateOf: string | null;
+  requiresTwoLevel: boolean;
+  seniorApprovedBy: string | null;
+  seniorApprovedAt: string | null;
   createdAt: string;
   updatedAt: string;
 }

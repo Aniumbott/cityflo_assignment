@@ -17,7 +17,7 @@
 | Background jobs | **In-process async** (no Redis) | Simple fire-and-forget after HTTP response, free tier friendly |
 | Database | **Render PostgreSQL** (free tier) | Managed, no local Docker needed |
 | Backend hosting | **Render** (Docker deploy from `/backend`) | Free tier, Docker support |
-| Frontend hosting | **Vercel** (from `/frontend`) | Free tier, great for Vite/React |
+| Frontend hosting | **Render** (Docker deploy from `/frontend`) | Free tier, Docker support |
 | ORM | **Prisma v5** (not v7 - v7 has breaking config changes) | Stable, well-documented |
 | DB migrations | **`prisma db push`** (not `migrate dev`) | Render free-tier PG lacks superuser for shadow DB required by migrate |
 | Theming | **Tailwind Dark Mode ('class')** | Manual toggle support + System preference |
@@ -54,7 +54,7 @@ The UI follows the "Cityflo" mobile app aesthetic: High contrast, rounded shapes
 
 | Layer | Technology | Hosting |
 |-------|-----------|---------|
-| Frontend | React 19 + TypeScript, Vite, Tailwind CSS v4, React Router v7, React Query, Axios, Lucide Icons, React Dropzone, React Hot Toast, Recharts | **Vercel** (free tier) |
+| Frontend | React 19 + TypeScript, Vite, Tailwind CSS v4, React Router v7, React Query, Axios, Lucide Icons, React Dropzone, React Hot Toast, Recharts | **Render** (free tier, Docker deploy) |
 | Backend | Node.js + Express 5 + TypeScript, Multer, Morgan, Helmet, CORS, express-rate-limit | **Render** (free tier, Docker deploy) |
 | Database | PostgreSQL | **Render PostgreSQL** (free tier) |
 | ORM | Prisma v5 (`prisma@5`, `@prisma/client@5`) | - |
@@ -296,7 +296,7 @@ frontend/src/index.css                             # (modified) Added CSS transi
     - [x] Full API reference (auth, invoices, notifications endpoints).
     - [x] Design system documentation (colors, components).
     - [x] Project structure overview.
-    - [x] Deployment instructions for Render (backend) and Vercel (frontend).
+    - [x] Deployment instructions for Render (backend and frontend).
     - [x] Security notes (JWT, password hashing, CORS, rate limiting).
     - [x] Key workflows explained (employee upload, accounts review, bulk operations).
     - [x] Troubleshooting guide.
@@ -313,7 +313,7 @@ frontend/src/index.css                             # (modified) Added CSS transi
     - [x] Can be imported into Swagger UI, Postman, or Insomnia.
     - [x] Quick reference also embedded in README.md.
 - [ ] **MANUAL STEP**: Deploy backend to Render (instructions provided in README.md).
-- [ ] **MANUAL STEP**: Deploy frontend to Vercel (instructions provided in README.md).
+- [ ] **MANUAL STEP**: Deploy frontend to Render (instructions provided in README.md and DEPLOYMENT.md).
 - [ ] **MANUAL STEP**: End-to-end verification in production.
 
 **Key files created/modified in Phase 10:**
@@ -569,7 +569,7 @@ PLAN.md                                         # (modified) Current status upda
 - [x] Database schema with Prisma ORM
 - [x] File upload validation (PDF only, 10MB max)
 - [x] API documentation (OpenAPI 3.0 spec)
-- [x] Deployment instructions (Render + Vercel)
+- [x] Deployment instructions (Render for backend + frontend)
 - [x] Analytics dashboard with interactive charts
 - [x] Bulk operations support
 - [x] Duplicate detection
@@ -577,7 +577,7 @@ PLAN.md                                         # (modified) Current status upda
 - [x] Audit trail with timeline visualization
 - [x] Two-level approval workflow for high-value invoices
 - [x] Zero breaking bugs
-- [ ] **MANUAL**: Deploy to production (Render + Vercel)
+- [ ] **MANUAL**: Deploy to production (Render for backend + frontend)
 - [ ] **MANUAL**: End-to-end testing in production
 
 ---
@@ -588,7 +588,7 @@ PLAN.md                                         # (modified) Current status upda
 **Backend**: Node.js, Express 5, Prisma v5, PostgreSQL, JWT (jsonwebtoken), bcryptjs, Multer, Jest, Supertest
 **AI/ML**: Google Gemini 2.5 Flash API (@google/generative-ai)
 **Tools**: Vite, ESLint, TypeScript strict mode, Docker, Git
-**Deployment**: Render (backend with Docker), Vercel (frontend), Render PostgreSQL
+**Deployment**: Render (backend + frontend with Docker), Render PostgreSQL
 **Testing**: Vitest + RTL (frontend), Jest + Supertest (backend), 121 total tests
 
 ---

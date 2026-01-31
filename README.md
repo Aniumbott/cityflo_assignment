@@ -19,17 +19,6 @@ A full-stack invoice management application with AI-powered PDF extraction, buil
 
 ---
 
-## 📋 Recent Updates
-
-### 2026-01-31
-- ✅ **Fixed critical test bug**: Resolved missing `fetchPdfBlob` mock causing 16 test failures
-- ✅ **All tests passing**: 121/121 tests now pass (70 frontend + 51 backend)
-- ✅ **Two-level approval workflow**: Implemented high-value invoice approval system
-- ✅ **Authenticated PDF viewer**: PDFs now loaded as secure blobs with JWT authentication
-- ✅ **Status configurations**: Added support for PENDING_SENIOR_APPROVAL and PENDING_FINAL_APPROVAL states
-
----
-
 ## 🎯 Features
 
 ### For Employees
@@ -85,7 +74,7 @@ A full-stack invoice management application with AI-powered PDF extraction, buil
 | **AI** | Google Gemini 2.5 Flash | PDF invoice data extraction |
 | **Testing** | Vitest + RTL (frontend) | 70 component/integration tests |
 | | Jest + Supertest (backend) | 51 API tests |
-| **Deployment** | Vercel (frontend) | Serverless hosting |
+| **Deployment** | Render (frontend) | Docker container hosting |
 | | Render (backend) | Docker container hosting |
 | | Render PostgreSQL | Managed database |
 
@@ -332,41 +321,33 @@ cityflow_assignment/
 
 ## 🚢 Deployment
 
-### Backend (Render)
+Both frontend and backend are deployed on **Render** using the Blueprint configuration in `render.yaml`.
 
-1. **Create a new Web Service** on [Render](https://render.com)
-2. **Connect your Git repository**
-3. **Configure:**
-   - **Root Directory**: `backend`
-   - **Build Command**: `npm install && npx prisma generate && npm run build`
-   - **Start Command**: `npm start`
-   - **Docker**: Use `Dockerfile` in `/backend`
-4. **Environment Variables**:
-   - `DATABASE_URL` (from Render PostgreSQL)
-   - `GEMINI_API_KEY`
-   - `JWT_ACCESS_SECRET`
-   - `JWT_REFRESH_SECRET`
-   - `NODE_ENV=production`
-5. **Run Migration**: After first deploy, run `npx prisma db push` in Render Shell
+### Quick Deploy (Recommended)
 
-### Frontend (Vercel)
+1. Go to [Render Dashboard](https://dashboard.render.com/) → **New** → **Blueprint**
+2. Connect your GitHub repository
+3. Render auto-detects `render.yaml` and creates all services:
+   - **cityflo-assignment-backend** (Docker web service)
+   - **cityflo-assignment-frontend** (Docker web service)
+   - **cityflo-invoices-db** (PostgreSQL database)
+4. Set required environment variables in Render Dashboard:
+   - `GEMINI_API_KEY` - Get from [Google AI Studio](https://aistudio.google.com/app/apikey)
+   - `JWT_ACCESS_SECRET` - Generate with `openssl rand -base64 32`
+   - `JWT_REFRESH_SECRET` - Generate with `openssl rand -base64 32`
+5. Click **Apply** to deploy
 
-1. **Import project** on [Vercel](https://vercel.com)
-2. **Configure:**
-   - **Root Directory**: `frontend`
-   - **Build Command**: `npm run build`
-   - **Output Directory**: `dist`
-3. **Environment Variables**:
-   - `VITE_API_URL` (your Render backend URL, e.g., `https://your-app.onrender.com`)
-4. **Update** `frontend/vite.config.ts` for production proxy (or use VITE_API_URL in axios.ts)
+### Live URLs
 
-### Database (Render PostgreSQL)
+- **Frontend**: https://cityflo-assignment-frontend.onrender.com
+- **Backend API**: https://cityflo-assignment-backend.onrender.com
 
-1. Create a **PostgreSQL** instance on Render (free tier)
-2. Copy the **External Database URL**
-3. Set as `DATABASE_URL` in backend environment variables
-4. Run `npx prisma db push` to create tables
-5. Run `npx prisma db seed` to create test users
+### Post-Deployment
+
+1. Open the backend service Shell in Render Dashboard
+2. Run `npm run prisma:seed` to create test users
+
+For detailed instructions, see [DEPLOYMENT.md](DEPLOYMENT.md).
 
 ---
 
@@ -436,42 +417,11 @@ cityflow_assignment/
 
 ---
 
-## 🐛 Troubleshooting
-
-### Backend won't start
-- Check `DATABASE_URL` is correct and database is accessible
-- Run `npx prisma generate` in `/backend`
-- Check `GEMINI_API_KEY` is valid
-
-### Frontend won't connect to backend
-- Ensure backend is running on port 3000
-- Check `vite.config.ts` proxy is set to `http://localhost:3000`
-- Clear browser cache / localStorage
-
-### Extraction fails
-- Check Gemini API quota (free tier: 15 requests/min)
-- Ensure PDF is valid and has readable text (not scanned image)
-- Check backend logs for Gemini API errors
-
-### Tests failing
-- Run `npm install` in both `/frontend` and `/backend`
-- Check `.env` file exists in root
-- For backend tests: ensure test database is accessible
-- Clear test cache: `npm run test:frontend -- --clearCache` or `npm run test:backend -- --clearCache`
-
-### PDF preview not loading in browser
-- The app now fetches PDFs as authenticated blobs (more secure)
-- Ensure backend is running and JWT token is valid
-- Check browser console for CORS or network errors
-- Clear browser cache and reload
-
----
-
 ## 📊 Performance & Metrics
 
 - **Frontend Bundle**: ~830KB gzipped (Vite optimized, includes Recharts)
 - **Backend Response Time**: <100ms for most endpoints (excluding PDF extraction)
-- **PDF Extraction**: 2-5 seconds per invoice (Gemini API call, async processing)
+- **PDF Extraction**: 10-15 seconds per invoice (Gemini API call, async processing)
 - **PDF Download**: Authenticated blob streaming with ~50ms overhead
 - **Analytics Queries**: <200ms with proper database indexing
 - **Notification Polling**: 30-second interval (React Query automatic refetch)
@@ -481,56 +431,12 @@ cityflow_assignment/
 
 ---
 
-## 🎓 Learning Resources
-
-- [React 19 Docs](https://react.dev)
-- [Tailwind CSS v4](https://tailwindcss.com)
-- [Prisma Docs](https://www.prisma.io/docs)
-- [Google Gemini API](https://ai.google.dev/gemini-api/docs)
-- [Vitest Docs](https://vitest.dev)
-
----
-
-## 📜 License
-
-MIT License - feel free to use this project as a learning resource or starting point for your own invoice management system.
-
----
-
-## 👥 Credits
-
-Built as part of the Cityflo internship assignment. Designed and implemented with:
-- **React 19** for modern component architecture and improved performance
-- **Tailwind CSS v4** for rapid, consistent styling with native CSS variables
-- **Google Gemini 2.5 Flash** for AI-powered invoice extraction
-- **PostgreSQL + Prisma v5** for type-safe database access
-- **TypeScript 5.9** throughout for type safety and better developer experience
-- **Vitest + Jest** for comprehensive test coverage (121 tests)
-
 ### Key Technical Achievements
-- ✅ 100% test pass rate (121/121 tests)
-- ✅ Zero TypeScript compilation errors
-- ✅ Zero breaking bugs in production code
 - ✅ Full dark mode support with CSS variables
 - ✅ Responsive design (mobile-first approach)
 - ✅ Type-safe API with OpenAPI documentation
 - ✅ Secure authentication with JWT refresh tokens
 - ✅ Role-based access control with 3 user levels
-
----
-
-## 🚀 Next Steps / Future Enhancements
-
-- [x] Two-level approval workflow (ACCOUNTS → SENIOR_ACCOUNTS) - **Implemented**
-- [ ] Email notifications (SendGrid/Resend integration)
-- [ ] Webhook support for external integrations
-- [ ] Advanced duplicate detection (fuzzy matching, ML-based)
-- [ ] Batch PDF processing queue (Bull/BullMQ)
-- [ ] Multi-language support (i18n)
-- [ ] Mobile app (React Native)
-- [ ] OCR fallback for scanned invoices
-- [ ] Invoice templates and validation rules
-- [ ] Payment integration (Razorpay/Stripe)
 
 ---
 

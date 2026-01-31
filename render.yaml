@@ -1,0 +1,53 @@
+services:
+  # Backend Web Service (Docker)
+  - type: web
+    name: cityflo-assignment-backend
+    runtime: docker
+    repo: https://github.com/Aniumbott/cityflo_assignment.git
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    region: singapore
+    plan: free
+    branch: master
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: cityflo-invoices-db
+          property: connectionString
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: JWT_ACCESS_SECRET
+        sync: false
+      - key: JWT_REFRESH_SECRET
+        sync: false
+      - key: FRONTEND_URL
+        value: https://cityflo-assignment-frontend.onrender.com
+      - key: PORT
+        value: 3000
+
+  # Frontend Static Site
+  - type: web
+    name: cityflo-assignment-frontend
+    runtime: docker
+    repo: https://github.com/Aniumbott/cityflo_assignment.git
+    dockerfilePath: ./frontend/Dockerfile
+    dockerContext: ./frontend
+    region: singapore
+    plan: free
+    branch: master
+    autoDeploy: true
+    envVars:
+      - key: BACKEND_URL
+        value: https://cityflo-assignment-backend.onrender.com
+
+databases:
+  # PostgreSQL Database
+  - name: cityflo-invoices-db
+    region: singapore
+    plan: free
+    databaseName: cityflo_invoices_db
+    user: cityflo_invoices_db_user

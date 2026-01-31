@@ -9,6 +9,8 @@ import LoginPage from './pages/LoginPage';
 import UploadPage from './pages/UploadPage';
 import SubmissionsPage from './pages/SubmissionsPage';
 import InvoiceDetailPage from './pages/InvoiceDetailPage';
+import AllInvoicesPage from './pages/AllInvoicesPage';
+import InvoiceReviewPage from './pages/InvoiceReviewPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -19,17 +21,6 @@ const queryClient = new QueryClient({
   },
 });
 
-// Placeholder pages for future phases
-function PlaceholderPage({ title }: { title: string }) {
-  return (
-    <div className="flex items-center justify-center h-64">
-      <div className="text-center">
-        <h2 className="text-xl font-semibold text-ink dark:text-cloud">{title}</h2>
-        <p className="mt-1 text-sm text-slate dark:text-ash">Coming soon</p>
-      </div>
-    </div>
-  );
-}
 
 function App() {
   return (
@@ -71,13 +62,13 @@ function App() {
                   path="invoices"
                   element={
                     <ProtectedRoute roles={['ACCOUNTS', 'SENIOR_ACCOUNTS']}>
-                      <PlaceholderPage title="All Invoices" />
+                      <AllInvoicesPage />
                     </ProtectedRoute>
                   }
                 />
                 <Route
                   path="invoices/:id"
-                  element={<InvoiceDetailPage />}
+                  element={<InvoiceDetailRouteSwitch />}
                 />
 
                 {/* Default redirect based on role handled by index */}
@@ -92,6 +83,15 @@ function App() {
       </ThemeProvider>
     </QueryClientProvider>
   );
+}
+
+function InvoiceDetailRouteSwitch() {
+  const { user } = useAuth();
+  if (!user) return null;
+  if (user.role === 'ACCOUNTS' || user.role === 'SENIOR_ACCOUNTS') {
+    return <InvoiceReviewPage />;
+  }
+  return <InvoiceDetailPage />;
 }
 
 function RoleBasedRedirect() {

@@ -9,10 +9,10 @@ import {
   LogOut,
   Menu,
   X,
-  Bell,
 } from 'lucide-react';
 import type { UserRole } from '../types';
 import ThemeToggle from './ui/ThemeToggle';
+import NotificationPanel from './NotificationPanel';
 
 interface NavItem {
   label: string;
@@ -169,10 +169,8 @@ export default function Layout() {
           {/* Theme toggle */}
           <ThemeToggle />
 
-          {/* Notification bell placeholder */}
-          <button className="p-2 rounded-xl text-slate dark:text-ash hover:bg-surface-hover dark:hover:bg-charcoal-hover relative">
-            <Bell className="h-5 w-5" />
-          </button>
+          {/* Notification panel */}
+          <NotificationPanel />
 
           {/* User info (desktop header) */}
           <div className="hidden sm:flex items-center gap-2">

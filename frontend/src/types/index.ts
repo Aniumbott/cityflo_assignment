@@ -145,3 +145,74 @@ export interface InvoiceDetail extends Invoice {
 export interface InvoiceDetailResponse {
   invoice: InvoiceDetail;
 }
+
+// Accounts team action types
+export interface UpdateStatusRequest {
+  status: 'APPROVED' | 'REJECTED' | 'PAID';
+  comment?: string;
+}
+
+export interface UpdateStatusResponse {
+  invoice: Invoice;
+}
+
+export interface EditExtractedDataRequest {
+  vendorName?: string | null;
+  invoiceNumber?: string | null;
+  invoiceDate?: string | null;
+  dueDate?: string | null;
+  subtotal?: number | null;
+  tax?: number | null;
+  grandTotal?: number | null;
+  paymentTerms?: string | null;
+  bankDetails?: string | null;
+  lineItems?: {
+    description: string | null;
+    quantity: number | null;
+    unitPrice: number | null;
+    total: number | null;
+  }[];
+}
+
+export interface EditExtractedDataResponse {
+  extractedData: ExtractedData;
+}
+
+export interface BulkActionRequest {
+  invoiceIds: string[];
+  action: 'APPROVED' | 'REJECTED';
+  comment?: string;
+}
+
+export interface BulkActionResponse {
+  updated: number;
+}
+
+// Notification types
+export interface Notification {
+  id: string;
+  userId: string;
+  invoiceId: string | null;
+  message: string;
+  read: boolean;
+  createdAt: string;
+  invoice: {
+    id: string;
+    originalFilename: string;
+    status: InvoiceStatus;
+  } | null;
+}
+
+export interface NotificationListResponse {
+  notifications: Notification[];
+  unreadCount: number;
+  pagination: Pagination;
+}
+
+export interface MarkNotificationReadResponse {
+  notification: Notification;
+}
+
+export interface MarkAllReadResponse {
+  updated: number;
+}

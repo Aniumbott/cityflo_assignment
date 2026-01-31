@@ -5,6 +5,8 @@ import morgan from 'morgan';
 import rateLimit from 'express-rate-limit';
 import path from 'path';
 import fs from 'fs';
+import swaggerUi from 'swagger-ui-express';
+import yaml from 'js-yaml';
 import { config } from './config';
 import authRoutes from './routes/auth';
 import invoiceRoutes from './routes/invoices';
@@ -41,6 +43,19 @@ app.use('/api/', limiter);
 app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
+
+// Swagger API Documentation
+const openApiPath = path.resolve(__dirname, '../../openapi.yaml');
+if (fs.existsSync(openApiPath)) {
+  const openApiDocument = yaml.load(fs.readFileSync(openApiPath, 'utf8')) as Record<string, any>;
+  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(openApiDocument, {
+    customCss: '.swagger-ui .topbar { display: none }',
+    customSiteTitle: 'Cityflo Invoice API',
+  }));
+  console.log('📚 Swagger UI available at /api-docs');
+} else {
+  console.warn('⚠️  openapi.yaml not found, Swagger UI disabled');
+}
 
 // Routes
 app.use('/api/auth', authRoutes);

@@ -17,7 +17,8 @@
       "Bash(npx vitest run)",
       "Bash(npm run build:*)",
       "Bash(npm run test:frontend:*)",
-      "Bash(npx vitest run:*)"
+      "Bash(npx vitest run:*)",
+      "Bash(npm run dev:*)"
     ]
   }
 }

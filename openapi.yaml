@@ -1,0 +1,980 @@
+openapi: 3.0.3
+info:
+  title: Cityflo Invoice Processing System API
+  description: |
+    REST API for the Cityflo Invoice Processing System.
+
+    Features:
+    - JWT authentication with refresh tokens
+    - Role-based access control (EMPLOYEE, ACCOUNTS, SENIOR_ACCOUNTS)
+    - Invoice upload and management
+    - AI-powered PDF extraction via Google Gemini
+    - Real-time notifications
+    - Audit logging
+
+    **Authentication:**
+    Most endpoints require a JWT access token in the Authorization header:
+    ```
+    Authorization: Bearer <access_token>
+    ```
+
+    **Base URL (Development):** `http://localhost:3000/api`
+    **Base URL (Production):** `https://your-app.onrender.com/api`
+
+  version: 1.0.0
+  contact:
+    name: Cityflo Dev Team
+    email: dev@cityflo.com
+
+servers:
+  - url: http://localhost:3000/api
+    description: Development server
+  - url: https://your-app.onrender.com/api
+    description: Production server (Render)
+
+tags:
+  - name: Authentication
+    description: User authentication and token management
+  - name: Invoices
+    description: Invoice CRUD operations, status updates, and exports
+  - name: Notifications
+    description: User notification management
+  - name: Audit
+    description: Audit log access
+  - name: Health
+    description: Health check endpoint
+
+paths:
+  /auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: Login with username and password
+      description: Authenticate user and receive access + refresh tokens
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - username
+                - password
+              properties:
+                username:
+                  type: string
+                  example: employee1
+                password:
+                  type: string
+                  format: password
+                  example: password123
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accessToken:
+                    type: string
+                    description: JWT access token (expires in 15 minutes)
+                  refreshToken:
+                    type: string
+                    description: JWT refresh token (expires in 7 days)
+                  user:
+                    $ref: '#/components/schemas/User'
+        '401':
+          description: Invalid credentials
+        '400':
+          description: Missing username or password
+
+  /auth/refresh:
+    post:
+      tags:
+        - Authentication
+      summary: Refresh access token
+      description: Get a new access token using a valid refresh token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - refreshToken
+              properties:
+                refreshToken:
+                  type: string
+      responses:
+        '200':
+          description: Token refreshed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accessToken:
+                    type: string
+        '401':
+          description: Invalid or expired refresh token
+
+  /auth/me:
+    get:
+      tags:
+        - Authentication
+      summary: Get current user profile
+      description: Retrieve the authenticated user's profile
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: User profile retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    allOf:
+                      - $ref: '#/components/schemas/User'
+                      - type: object
+                        properties:
+                          createdAt:
+                            type: string
+                            format: date-time
+        '401':
+          description: Not authenticated
+
+  /invoices:
+    post:
+      tags:
+        - Invoices
+      summary: Upload invoices
+      description: Upload up to 10 PDF invoices (max 10MB each)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - files
+                - category
+              properties:
+                files:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+                  maxItems: 10
+                  description: PDF files (max 10 files, 10MB each)
+                category:
+                  type: string
+                  enum: [VENDOR_PAYMENT, REIMBURSEMENT]
+                notes:
+                  type: string
+                  description: Optional notes
+      responses:
+        '201':
+          description: Invoices uploaded successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  invoices:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Invoice'
+        '400':
+          description: Invalid file type, size, or missing fields
+        '401':
+          description: Not authenticated
+        '403':
+          description: Not authorized (EMPLOYEE role required)
+
+    get:
+      tags:
+        - Invoices
+      summary: List invoices
+      description: Get paginated list of invoices with filters and search
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 10
+        - name: sortBy
+          in: query
+          schema:
+            type: string
+            enum: [createdAt, grandTotal, vendorName]
+            default: createdAt
+        - name: sortOrder
+          in: query
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: desc
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [PENDING_REVIEW, APPROVED, REJECTED, PAID]
+        - name: category
+          in: query
+          schema:
+            type: string
+            enum: [VENDOR_PAYMENT, REIMBURSEMENT]
+        - name: search
+          in: query
+          schema:
+            type: string
+          description: Search by filename, vendor name, or invoice number
+        - name: dateFrom
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: dateTo
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: amountMin
+          in: query
+          schema:
+            type: number
+        - name: amountMax
+          in: query
+          schema:
+            type: number
+        - name: submittedBy
+          in: query
+          schema:
+            type: string
+          description: Filter by user ID (ACCOUNTS/SENIOR_ACCOUNTS only)
+      responses:
+        '200':
+          description: Invoice list retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  invoices:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/InvoiceListItem'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+        '401':
+          description: Not authenticated
+
+  /invoices/{id}:
+    get:
+      tags:
+        - Invoices
+      summary: Get invoice details
+      description: Retrieve full invoice details including extracted data and actions
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Invoice details retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  invoice:
+                    $ref: '#/components/schemas/InvoiceDetail'
+        '404':
+          description: Invoice not found
+        '403':
+          description: Not authorized to view this invoice
+        '401':
+          description: Not authenticated
+
+  /invoices/{id}/status:
+    patch:
+      tags:
+        - Invoices
+      summary: Update invoice status
+      description: Approve, reject, or mark invoice as paid (ACCOUNTS/SENIOR_ACCOUNTS only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - status
+              properties:
+                status:
+                  type: string
+                  enum: [APPROVED, REJECTED, PAID]
+                comment:
+                  type: string
+                  description: Optional comment (required for REJECTED)
+      responses:
+        '200':
+          description: Status updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  invoice:
+                    $ref: '#/components/schemas/Invoice'
+        '400':
+          description: Invalid status transition or missing comment
+        '403':
+          description: Not authorized (ACCOUNTS/SENIOR_ACCOUNTS only)
+        '404':
+          description: Invoice not found
+
+  /invoices/{id}/extracted-data:
+    patch:
+      tags:
+        - Invoices
+      summary: Edit extracted invoice data
+      description: Update extracted invoice fields (ACCOUNTS/SENIOR_ACCOUNTS only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                vendorName:
+                  type: string
+                  nullable: true
+                invoiceNumber:
+                  type: string
+                  nullable: true
+                invoiceDate:
+                  type: string
+                  format: date
+                  nullable: true
+                dueDate:
+                  type: string
+                  format: date
+                  nullable: true
+                subtotal:
+                  type: number
+                  nullable: true
+                tax:
+                  type: number
+                  nullable: true
+                grandTotal:
+                  type: number
+                  nullable: true
+                paymentTerms:
+                  type: string
+                  nullable: true
+                bankDetails:
+                  type: string
+                  nullable: true
+                lineItems:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      description:
+                        type: string
+                        nullable: true
+                      quantity:
+                        type: number
+                        nullable: true
+                      unitPrice:
+                        type: number
+                        nullable: true
+                      total:
+                        type: number
+                        nullable: true
+      responses:
+        '200':
+          description: Extracted data updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  extractedData:
+                    $ref: '#/components/schemas/ExtractedData'
+        '403':
+          description: Not authorized
+        '404':
+          description: Invoice not found
+
+  /invoices/{id}/pdf:
+    get:
+      tags:
+        - Invoices
+      summary: View invoice PDF
+      description: Retrieve the original PDF file
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: PDF file
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        '404':
+          description: Invoice or PDF not found
+        '403':
+          description: Not authorized
+
+  /invoices/bulk-action:
+    post:
+      tags:
+        - Invoices
+      summary: Bulk approve or reject invoices
+      description: Update status of multiple invoices at once (ACCOUNTS/SENIOR_ACCOUNTS only)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - invoiceIds
+                - action
+              properties:
+                invoiceIds:
+                  type: array
+                  items:
+                    type: string
+                    format: uuid
+                  minItems: 1
+                action:
+                  type: string
+                  enum: [APPROVED, REJECTED]
+                comment:
+                  type: string
+                  description: Optional comment (required for REJECTED)
+      responses:
+        '200':
+          description: Bulk action completed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  updated:
+                    type: integer
+                    description: Number of invoices updated
+        '400':
+          description: Invalid action or missing comment for rejection
+        '403':
+          description: Not authorized
+
+  /invoices/export/csv:
+    get:
+      tags:
+        - Invoices
+      summary: Export invoices to CSV
+      description: Download invoices as CSV with same filters as list endpoint (ACCOUNTS/SENIOR_ACCOUNTS only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [PENDING_REVIEW, APPROVED, REJECTED, PAID]
+        - name: category
+          in: query
+          schema:
+            type: string
+            enum: [VENDOR_PAYMENT, REIMBURSEMENT]
+        - name: search
+          in: query
+          schema:
+            type: string
+        - name: dateFrom
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: dateTo
+          in: query
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: CSV file
+          content:
+            text/csv:
+              schema:
+                type: string
+        '403':
+          description: Not authorized
+
+  /invoices/{id}/audit-log:
+    get:
+      tags:
+        - Audit
+      summary: Get invoice audit log
+      description: Retrieve all actions performed on an invoice (ACCOUNTS/SENIOR_ACCOUNTS only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Audit log retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  actions:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/InvoiceAction'
+        '404':
+          description: Invoice not found
+        '403':
+          description: Not authorized
+
+  /notifications:
+    get:
+      tags:
+        - Notifications
+      summary: List user notifications
+      description: Get paginated list of notifications for current user
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+      responses:
+        '200':
+          description: Notifications retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  notifications:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Notification'
+                  unreadCount:
+                    type: integer
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+
+  /notifications/{id}/read:
+    patch:
+      tags:
+        - Notifications
+      summary: Mark notification as read
+      description: Mark a specific notification as read
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Notification marked as read
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  notification:
+                    $ref: '#/components/schemas/Notification'
+        '404':
+          description: Notification not found
+        '403':
+          description: Not your notification
+
+  /notifications/read-all:
+    patch:
+      tags:
+        - Notifications
+      summary: Mark all notifications as read
+      description: Mark all unread notifications as read for current user
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: All notifications marked as read
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  updated:
+                    type: integer
+                    description: Number of notifications updated
+
+  /health:
+    get:
+      tags:
+        - Health
+      summary: Health check
+      description: Check if the API is running
+      responses:
+        '200':
+          description: API is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+                  timestamp:
+                    type: string
+                    format: date-time
+                  uptime:
+                    type: number
+                    description: Server uptime in seconds
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        username:
+          type: string
+        role:
+          type: string
+          enum: [EMPLOYEE, ACCOUNTS, SENIOR_ACCOUNTS]
+
+    Invoice:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        submittedBy:
+          type: string
+          format: uuid
+        category:
+          type: string
+          enum: [VENDOR_PAYMENT, REIMBURSEMENT]
+        status:
+          type: string
+          enum: [PENDING_REVIEW, APPROVED, REJECTED, PAID]
+        notes:
+          type: string
+          nullable: true
+        filePath:
+          type: string
+        originalFilename:
+          type: string
+        extractionStatus:
+          type: string
+          enum: [PENDING, PROCESSING, COMPLETED, FAILED]
+        isDuplicate:
+          type: boolean
+        duplicateOf:
+          type: string
+          format: uuid
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    InvoiceListItem:
+      allOf:
+        - $ref: '#/components/schemas/Invoice'
+        - type: object
+          properties:
+            submitter:
+              type: object
+              properties:
+                id:
+                  type: string
+                  format: uuid
+                username:
+                  type: string
+                email:
+                  type: string
+            extractedData:
+              type: object
+              nullable: true
+              properties:
+                vendorName:
+                  type: string
+                  nullable: true
+                invoiceNumber:
+                  type: string
+                  nullable: true
+                grandTotal:
+                  type: string
+                  nullable: true
+
+    InvoiceDetail:
+      allOf:
+        - $ref: '#/components/schemas/Invoice'
+        - type: object
+          properties:
+            submitter:
+              type: object
+              properties:
+                id:
+                  type: string
+                  format: uuid
+                username:
+                  type: string
+                email:
+                  type: string
+                role:
+                  type: string
+            extractedData:
+              $ref: '#/components/schemas/ExtractedData'
+            actions:
+              type: array
+              items:
+                $ref: '#/components/schemas/InvoiceAction'
+
+    ExtractedData:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        invoiceId:
+          type: string
+          format: uuid
+        vendorName:
+          type: string
+          nullable: true
+        invoiceNumber:
+          type: string
+          nullable: true
+        invoiceDate:
+          type: string
+          format: date
+          nullable: true
+        dueDate:
+          type: string
+          format: date
+          nullable: true
+        subtotal:
+          type: string
+          nullable: true
+        tax:
+          type: string
+          nullable: true
+        grandTotal:
+          type: string
+          nullable: true
+        paymentTerms:
+          type: string
+          nullable: true
+        bankDetails:
+          type: string
+          nullable: true
+        rawText:
+          type: string
+          nullable: true
+        confidenceScores:
+          type: object
+          nullable: true
+          additionalProperties:
+            type: number
+            minimum: 0
+            maximum: 1
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        lineItems:
+          type: array
+          items:
+            $ref: '#/components/schemas/LineItem'
+
+    LineItem:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        extractedDataId:
+          type: string
+          format: uuid
+        description:
+          type: string
+          nullable: true
+        quantity:
+          type: string
+          nullable: true
+        unitPrice:
+          type: string
+          nullable: true
+        total:
+          type: string
+          nullable: true
+
+    InvoiceAction:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        invoiceId:
+          type: string
+          format: uuid
+        userId:
+          type: string
+          format: uuid
+        action:
+          type: string
+          enum: [SUBMITTED, VIEWED, EDITED, APPROVED, REJECTED, MARKED_PAID]
+        comment:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        user:
+          type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+            username:
+              type: string
+            role:
+              type: string
+
+    Notification:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        userId:
+          type: string
+          format: uuid
+        invoiceId:
+          type: string
+          format: uuid
+          nullable: true
+        message:
+          type: string
+        read:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        invoice:
+          type: object
+          nullable: true
+          properties:
+            id:
+              type: string
+              format: uuid
+            originalFilename:
+              type: string
+            status:
+              type: string
+
+    Pagination:
+      type: object
+      properties:
+        page:
+          type: integer
+        limit:
+          type: integer
+        total:
+          type: integer
+        totalPages:
+          type: integer

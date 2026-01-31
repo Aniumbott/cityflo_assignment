@@ -1,7 +1,10 @@
 import axios from 'axios';
 
+// Use backend URL from environment or default to production backend
+const API_URL = import.meta.env.VITE_API_URL || 'https://cityflo-assignment-backend.onrender.com';
+
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: `${API_URL}/api`,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -73,7 +76,7 @@ api.interceptors.response.use(
     }
 
     try {
-      const { data } = await axios.post('/api/auth/refresh', { refreshToken });
+      const { data } = await axios.post(`${API_URL}/api/auth/refresh`, { refreshToken });
       const newAccessToken: string = data.accessToken;
       localStorage.setItem('accessToken', newAccessToken);
       processQueue(null, newAccessToken);

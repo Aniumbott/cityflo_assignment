@@ -40,8 +40,9 @@ services:
     plan: free
     branch: master
     autoDeploy: true
+    dockerCommand: serve -s dist -l 3000
     envVars:
-      - key: BACKEND_URL
+      - key: VITE_API_URL
         value: https://cityflo-assignment-backend.onrender.com
 
 databases:

@@ -5,16 +5,17 @@ WORKDIR /app
 COPY package*.json ./
 COPY prisma ./prisma/
 
-# Set placeholder DATABASE_URL for build phase
-ENV DATABASE_URL="postgresql://placeholder:placeholder@localhost:5432/placeholder"
+# Install dependencies without running postinstall scripts
+RUN npm ci --ignore-scripts
 
-# Install dependencies (postinstall will run prisma generate)
-RUN npm ci
+# Generate Prisma Client (doesn't need real DATABASE_URL)
+RUN npx prisma generate
 
 COPY tsconfig.json ./
 COPY src ./src/
 
-RUN npm run build
+# Build TypeScript
+RUN npx tsc
 
 FROM node:20-alpine
 
@@ -23,11 +24,11 @@ WORKDIR /app
 COPY package*.json ./
 COPY prisma ./prisma/
 
-# Set placeholder DATABASE_URL for build phase
-ENV DATABASE_URL="postgresql://placeholder:placeholder@localhost:5432/placeholder"
+# Install production dependencies without running postinstall scripts
+RUN npm ci --omit=dev --ignore-scripts
 
-# Install production dependencies (postinstall will run prisma generate)
-RUN npm ci --omit=dev
+# Generate Prisma Client (doesn't need real DATABASE_URL)
+RUN npx prisma generate
 
 COPY --from=builder /app/dist ./dist
 

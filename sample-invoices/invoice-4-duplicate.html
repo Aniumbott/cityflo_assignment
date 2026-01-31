@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Invoice - TechSupplies Inc. DUPLICATE</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 20px;
+      color: #333;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 40px;
+      border-bottom: 3px solid #2563eb;
+      padding-bottom: 20px;
+    }
+    .company-info {
+      flex: 1;
+    }
+    .company-name {
+      font-size: 28px;
+      font-weight: bold;
+      color: #2563eb;
+      margin-bottom: 10px;
+    }
+    .invoice-details {
+      text-align: right;
+    }
+    .invoice-title {
+      font-size: 36px;
+      font-weight: bold;
+      color: #1e40af;
+    }
+    .section {
+      margin: 30px 0;
+    }
+    .section-title {
+      font-weight: bold;
+      margin-bottom: 10px;
+      color: #1e40af;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+    }
+    th {
+      background-color: #2563eb;
+      color: white;
+      padding: 12px;
+      text-align: left;
+    }
+    td {
+      padding: 10px 12px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    .text-right {
+      text-align: right;
+    }
+    .totals {
+      margin-left: auto;
+      width: 300px;
+      margin-top: 20px;
+    }
+    .totals tr td {
+      padding: 8px 12px;
+    }
+    .grand-total {
+      font-size: 18px;
+      font-weight: bold;
+      background-color: #f3f4f6;
+    }
+    .footer {
+      margin-top: 50px;
+      padding-top: 20px;
+      border-top: 2px solid #e5e7eb;
+      font-size: 12px;
+      color: #6b7280;
+    }
+    .payment-terms {
+      background-color: #fef3c7;
+      padding: 15px;
+      border-left: 4px solid #f59e0b;
+      margin: 20px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="company-info">
+      <div class="company-name">TechSupplies Inc.</div>
+      <div>123 Business Park, Sector 18</div>
+      <div>Gurugram, Haryana 122015</div>
+      <div>GSTIN: 06AABCT1234F1Z5</div>
+      <div>Phone: +91-124-4567890</div>
+      <div>Email: billing@techsupplies.com</div>
+    </div>
+    <div class="invoice-details">
+      <div class="invoice-title">INVOICE</div>
+      <div style="margin-top: 20px;">
+        <strong>Invoice #:</strong> TS-2024-001<br>
+        <strong>Date:</strong> January 15, 2024<br>
+        <strong>Due Date:</strong> February 14, 2024
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">BILL TO:</div>
+    <div>
+      <strong>Cityflo Mobility Solutions</strong><br>
+      456 Corporate Tower, MG Road<br>
+      Bangalore, Karnataka 560001<br>
+      GSTIN: 29AACCT4321R1Z8
+    </div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Description</th>
+        <th class="text-right">Quantity</th>
+        <th class="text-right">Unit Price</th>
+        <th class="text-right">Amount</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Dell Latitude 5420 Laptop - i7, 16GB RAM, 512GB SSD</td>
+        <td class="text-right">5</td>
+        <td class="text-right">₹85,000.00</td>
+        <td class="text-right">₹4,25,000.00</td>
+      </tr>
+      <tr>
+        <td>HP LaserJet Pro MFP M428fdw Printer</td>
+        <td class="text-right">2</td>
+        <td class="text-right">₹32,500.00</td>
+        <td class="text-right">₹65,000.00</td>
+      </tr>
+      <tr>
+        <td>Logitech MX Master 3 Wireless Mouse</td>
+        <td class="text-right">10</td>
+        <td class="text-right">₹8,500.00</td>
+        <td class="text-right">₹85,000.00</td>
+      </tr>
+      <tr>
+        <td>Samsung 27" 4K Monitor (LU28E590DS)</td>
+        <td class="text-right">8</td>
+        <td class="text-right">₹28,000.00</td>
+        <td class="text-right">₹2,24,000.00</td>
+      </tr>
+      <tr>
+        <td>APC Back-UPS 1100VA UPS</td>
+        <td class="text-right">4</td>
+        <td class="text-right">₹12,500.00</td>
+        <td class="text-right">₹50,000.00</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <table class="totals">
+    <tr>
+      <td><strong>Subtotal:</strong></td>
+      <td class="text-right">₹8,49,000.00</td>
+    </tr>
+    <tr>
+      <td><strong>CGST (9%):</strong></td>
+      <td class="text-right">₹76,410.00</td>
+    </tr>
+    <tr>
+      <td><strong>SGST (9%):</strong></td>
+      <td class="text-right">₹76,410.00</td>
+    </tr>
+    <tr class="grand-total">
+      <td><strong>GRAND TOTAL:</strong></td>
+      <td class="text-right"><strong>₹10,01,820.00</strong></td>
+    </tr>
+  </table>
+
+  <div class="payment-terms">
+    <strong>Payment Terms:</strong> Net 30 Days<br>
+    <strong>Payment Method:</strong> Bank Transfer
+  </div>
+
+  <div class="section">
+    <div class="section-title">BANK DETAILS:</div>
+    <div>
+      <strong>Bank Name:</strong> HDFC Bank<br>
+      <strong>Account Name:</strong> TechSupplies Inc.<br>
+      <strong>Account Number:</strong> 50200012345678<br>
+      <strong>IFSC Code:</strong> HDFC0001234<br>
+      <strong>Branch:</strong> Gurugram Cyber City
+    </div>
+  </div>
+
+  <div class="footer">
+    <strong>Notes:</strong><br>
+    - Please include invoice number in payment reference<br>
+    - All items come with 1-year manufacturer warranty<br>
+    - Installation and setup support included<br>
+    <br>
+    <strong>For any queries, contact:</strong> accounts@techsupplies.com | +91-124-4567890
+  </div>
+</body>
+</html>

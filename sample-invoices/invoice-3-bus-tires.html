@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Invoice - MRF Tyres Depot</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      max-width: 800px;
+      margin: 30px auto;
+      padding: 20px;
+    }
+    .invoice-container {
+      border: 2px solid #1e3a8a;
+      padding: 0;
+    }
+    .header {
+      background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+      color: white;
+      padding: 25px;
+      text-align: center;
+    }
+    .company-name {
+      font-size: 30px;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    .company-info {
+      font-size: 13px;
+      line-height: 1.6;
+      margin-top: 10px;
+    }
+    .invoice-title {
+      background-color: #fbbf24;
+      color: #1e3a8a;
+      font-size: 24px;
+      font-weight: bold;
+      padding: 12px;
+      text-align: center;
+      border-bottom: 3px solid #1e3a8a;
+    }
+    .content {
+      padding: 25px;
+    }
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 25px;
+      font-size: 14px;
+    }
+    .detail-box {
+      flex: 1;
+      padding: 15px;
+      background-color: #f1f5f9;
+      margin: 0 5px;
+      border-left: 3px solid #1e3a8a;
+    }
+    .detail-label {
+      font-size: 11px;
+      color: #64748b;
+      text-transform: uppercase;
+      margin-bottom: 5px;
+      font-weight: 600;
+    }
+    .detail-value {
+      font-weight: 600;
+      color: #1e293b;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 13px;
+    }
+    thead {
+      background-color: #1e3a8a;
+      color: white;
+    }
+    th {
+      padding: 12px 10px;
+      text-align: left;
+      font-weight: 600;
+    }
+    td {
+      padding: 10px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .text-right {
+      text-align: right;
+    }
+    .product-desc {
+      font-size: 12px;
+      color: #64748b;
+      margin-top: 3px;
+    }
+    .summary {
+      margin-top: 25px;
+      margin-left: auto;
+      width: 320px;
+    }
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      font-size: 14px;
+    }
+    .summary-total {
+      background-color: #1e3a8a;
+      color: white;
+      font-size: 18px;
+      font-weight: bold;
+      padding: 12px;
+      margin-top: 10px;
+      border-radius: 4px;
+    }
+    .notes-section {
+      background-color: #fef3c7;
+      border-left: 4px solid #fbbf24;
+      padding: 15px;
+      margin: 20px 0;
+      font-size: 13px;
+    }
+    .bank-details {
+      background-color: #f1f5f9;
+      padding: 15px;
+      border-radius: 6px;
+      margin: 20px 0;
+      font-size: 13px;
+    }
+    .footer {
+      border-top: 2px solid #1e3a8a;
+      padding-top: 20px;
+      margin-top: 30px;
+      font-size: 11px;
+      color: #64748b;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="invoice-container">
+    <div class="header">
+      <div class="company-name">MRF TYRES & SERVICES</div>
+      <div style="font-size: 14px; margin: 5px 0;">Authorized Dealer - Commercial Vehicle Tyres</div>
+      <div class="company-info">
+        No. 156/2, Tumkur Road, Yeshwanthpur Industrial Area<br>
+        Bangalore - 560022, Karnataka, India<br>
+        GSTIN: 29AABCM1234E1Z7 | CIN: U25111KA1998PTC023456<br>
+        Phone: +91-80-2345-6789 | Email: sales@mrftyres-blr.com
+      </div>
+    </div>
+
+    <div class="invoice-title">TAX INVOICE</div>
+
+    <div class="content">
+      <div class="detail-row">
+        <div class="detail-box">
+          <div class="detail-label">Invoice Number</div>
+          <div class="detail-value">MRF/BLR/24/1567</div>
+        </div>
+        <div class="detail-box">
+          <div class="detail-label">Invoice Date</div>
+          <div class="detail-value">15-Jan-2024</div>
+        </div>
+        <div class="detail-box">
+          <div class="detail-label">Payment Due</div>
+          <div class="detail-value">29-Feb-2024</div>
+        </div>
+      </div>
+
+      <div style="margin-bottom: 25px;">
+        <div style="font-weight: bold; color: #1e3a8a; margin-bottom: 10px; font-size: 14px;">BILL TO:</div>
+        <div style="background-color: #f8fafc; padding: 15px; border-left: 3px solid #1e3a8a; font-size: 14px; line-height: 1.6;">
+          <strong>Cityflo Mobility Solutions Pvt Ltd</strong><br>
+          3rd Floor, Prestige Meridian, MG Road<br>
+          Bangalore - 560001, Karnataka<br>
+          <strong>GSTIN:</strong> 29AACCT5678P1Z2<br>
+          <strong>Contact Person:</strong> Mr. Suresh Rajan (Fleet Manager)<br>
+          <strong>Phone:</strong> +91-98765-43210
+        </div>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 45%;">Product Description</th>
+            <th style="width: 15%;" class="text-right">HSN</th>
+            <th style="width: 10%;" class="text-right">Qty</th>
+            <th style="width: 15%;" class="text-right">Unit Price</th>
+            <th style="width: 15%;" class="text-right">Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <strong>MRF Super Lug 511 - 10.00 R 20 (Rear Wheel)</strong>
+              <div class="product-desc">Heavy duty truck/bus tyre, tubeless<br>Load Index: 146/143 | Speed: J (100 km/h)</div>
+            </td>
+            <td class="text-right">4011</td>
+            <td class="text-right">8</td>
+            <td class="text-right">₹18,750.00</td>
+            <td class="text-right">₹1,50,000.00</td>
+          </tr>
+          <tr>
+            <td>
+              <strong>MRF Muscle Rib MA - 10.00 R 20 (Front Axle)</strong>
+              <div class="product-desc">Premium ribbed tyre for steering axle<br>Load Index: 146/143 | Speed: J (100 km/h)</div>
+            </td>
+            <td class="text-right">4011</td>
+            <td class="text-right">4</td>
+            <td class="text-right">₹19,500.00</td>
+            <td class="text-right">₹78,000.00</td>
+          </tr>
+          <tr>
+            <td>
+              <strong>Tyre Valves - TR-15 (Heavy Duty)</strong>
+              <div class="product-desc">Metal valves for tubeless tyres</div>
+            </td>
+            <td class="text-right">4016</td>
+            <td class="text-right">12</td>
+            <td class="text-right">₹150.00</td>
+            <td class="text-right">₹1,800.00</td>
+          </tr>
+          <tr>
+            <td>
+              <strong>Wheel Balancing & Alignment Service</strong>
+              <div class="product-desc">Professional balancing for 12 wheels</div>
+            </td>
+            <td class="text-right">9987</td>
+            <td class="text-right">12</td>
+            <td class="text-right">₹350.00</td>
+            <td class="text-right">₹4,200.00</td>
+          </tr>
+          <tr>
+            <td>
+              <strong>Old Tyre Disposal & Scrap Credit</strong>
+              <div class="product-desc">Exchange value for 12 old tyres</div>
+            </td>
+            <td class="text-right">-</td>
+            <td class="text-right">12</td>
+            <td class="text-right">-₹850.00</td>
+            <td class="text-right" style="color: #059669;">-₹10,200.00</td>
+          </tr>
+          <tr>
+            <td>
+              <strong>Installation & Fitting Charges</strong>
+              <div class="product-desc">On-site fitment at depot</div>
+            </td>
+            <td class="text-right">9987</td>
+            <td class="text-right">1</td>
+            <td class="text-right">₹3,500.00</td>
+            <td class="text-right">₹3,500.00</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="summary">
+        <div class="summary-row">
+          <span>Subtotal:</span>
+          <span>₹2,27,300.00</span>
+        </div>
+        <div class="summary-row">
+          <span>CGST @ 14%:</span>
+          <span>₹31,822.00</span>
+        </div>
+        <div class="summary-row">
+          <span>SGST @ 14%:</span>
+          <span>₹31,822.00</span>
+        </div>
+        <div class="summary-total">
+          <div style="display: flex; justify-content: space-between;">
+            <span>TOTAL PAYABLE:</span>
+            <span>₹2,90,944.00</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top: 15px; font-size: 14px; font-weight: 600;">
+        Amount in Words: Two Lakh Ninety Thousand Nine Hundred Forty-Four Rupees Only
+      </div>
+
+      <div class="notes-section">
+        <div style="font-weight: bold; margin-bottom: 8px;">PAYMENT TERMS & WARRANTY:</div>
+        • Payment Due: 45 Days from Invoice Date (Net 45)<br>
+        • Warranty: 60,000 km or 36 months from date of fitment (whichever earlier)<br>
+        • Free rotation service every 10,000 km for warranty period<br>
+        • 24/7 breakdown support available at 1800-425-7873
+      </div>
+
+      <div class="bank-details">
+        <div style="font-weight: bold; color: #1e3a8a; margin-bottom: 10px;">REMITTANCE DETAILS:</div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 13px;">
+          <div><strong>Bank Name:</strong> ICICI Bank Ltd</div>
+          <div><strong>Account Name:</strong> MRF Tyres & Services</div>
+          <div><strong>Account Number:</strong> 625505012345</div>
+          <div><strong>IFSC Code:</strong> ICIC0006255</div>
+          <div><strong>Branch:</strong> Yeshwanthpur, Bangalore</div>
+          <div><strong>Account Type:</strong> Current Account</div>
+        </div>
+      </div>
+
+      <div style="text-align: right; margin-top: 30px;">
+        <div style="margin-bottom: 50px; font-size: 13px;">
+          For <strong style="color: #1e3a8a;">MRF Tyres & Services</strong>
+        </div>
+        <div style="border-top: 1px solid #1e3a8a; display: inline-block; padding: 5px 30px; font-size: 12px;">
+          Authorized Signatory
+        </div>
+      </div>
+
+      <div class="footer">
+        <strong>Declaration:</strong> We declare that this invoice shows the actual price of the goods described and that all particulars are true and correct.<br>
+        <strong>Note:</strong> This is a computer-generated invoice and does not require a physical signature.<br>
+        <br>
+        <strong>Terms & Conditions apply. Visit:</strong> www.mrftyresandrubber.com/terms | <strong>Customer Care:</strong> 1800-425-7873
+      </div>
+    </div>
+  </div>
+</body>
+</html>

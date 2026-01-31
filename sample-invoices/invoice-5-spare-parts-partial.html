@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Invoice - Kumar Auto Spares</title>
+  <style>
+    body {
+      font-family: 'Courier New', monospace;
+      max-width: 700px;
+      margin: 30px auto;
+      padding: 20px;
+    }
+    .invoice {
+      border: 2px solid #000;
+      padding: 15px;
+    }
+    .header {
+      text-align: center;
+      border-bottom: 2px solid #000;
+      padding-bottom: 15px;
+      margin-bottom: 20px;
+    }
+    .shop-name {
+      font-size: 22px;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    .invoice-title {
+      font-size: 20px;
+      font-weight: bold;
+      text-decoration: underline;
+      margin: 15px 0 10px 0;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 15px 0;
+    }
+    th, td {
+      border: 1px solid #000;
+      padding: 8px;
+      text-align: left;
+    }
+    th {
+      background-color: #e0e0e0;
+    }
+    .text-right {
+      text-align: right;
+    }
+    .total-section {
+      margin-top: 20px;
+      float: right;
+      width: 250px;
+    }
+    .total-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 5px 0;
+      border-bottom: 1px solid #000;
+    }
+    .grand-total {
+      font-weight: bold;
+      font-size: 16px;
+      border-top: 2px solid #000;
+      margin-top: 10px;
+      padding-top: 10px;
+    }
+    .notes {
+      clear: both;
+      margin-top: 80px;
+      padding-top: 15px;
+      border-top: 1px dashed #000;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="invoice">
+    <div class="header">
+      <div class="shop-name">KUMAR AUTO SPARES</div>
+      <div style="font-size: 13px; margin-top: 5px;">Bus & Truck Spare Parts</div>
+      <div style="font-size: 12px; margin-top: 8px;">
+        Shop No. 12-15, K.R. Market Auto Complex<br>
+        Avenue Road, Bangalore - 560002<br>
+        Ph: 080-2287-4561 | Mob: 98450-12345
+      </div>
+      <div class="invoice-title">CASH MEMO</div>
+    </div>
+
+    <div style="margin-bottom: 15px;">
+      <div style="display: flex; justify-content: space-between;">
+        <div>
+          <strong>Bill No:</strong> KAS/2024/897
+        </div>
+        <div>
+          <strong>Date:</strong> 20/01/2024
+        </div>
+      </div>
+      <div style="margin-top: 10px;">
+        <strong>Customer:</strong> Cityflo<br>
+        <strong>Bus No:</strong> KA-01-FC-8923
+      </div>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th style="width: 50%;">Item Description</th>
+          <th class="text-right" style="width: 15%;">Qty</th>
+          <th class="text-right" style="width: 15%;">Rate</th>
+          <th class="text-right" style="width: 20%;">Amount</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Brake Shoe Set (Rear) - Tata</td>
+          <td class="text-right">2</td>
+          <td class="text-right">2,850</td>
+          <td class="text-right">5,700</td>
+        </tr>
+        <tr>
+          <td>Brake Lining Kit - Premium</td>
+          <td class="text-right">1</td>
+          <td class="text-right">3,200</td>
+          <td class="text-right">3,200</td>
+        </tr>
+        <tr>
+          <td>Wheel Cylinder - Rear LH</td>
+          <td class="text-right">1</td>
+          <td class="text-right">1,450</td>
+          <td class="text-right">1,450</td>
+        </tr>
+        <tr>
+          <td>Wheel Cylinder - Rear RH</td>
+          <td class="text-right">1</td>
+          <td class="text-right">1,450</td>
+          <td class="text-right">1,450</td>
+        </tr>
+        <tr>
+          <td>Brake Fluid DOT-4 (500ml)</td>
+          <td class="text-right">3</td>
+          <td class="text-right">380</td>
+          <td class="text-right">1,140</td>
+        </tr>
+        <tr>
+          <td>Spring Kit - Brake Assembly</td>
+          <td class="text-right">2</td>
+          <td class="text-right">650</td>
+          <td class="text-right">1,300</td>
+        </tr>
+        <tr>
+          <td>Misc. Nuts & Bolts</td>
+          <td class="text-right">-</td>
+          <td class="text-right">-</td>
+          <td class="text-right">250</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div style="clear: both; overflow: auto;">
+      <div class="total-section">
+        <div class="total-row">
+          <span>Subtotal:</span>
+          <span>14,490</span>
+        </div>
+        <div class="total-row">
+          <span>Discount:</span>
+          <span>-500</span>
+        </div>
+        <div class="total-row grand-total">
+          <span>Total:</span>
+          <span>₹13,990/-</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="notes">
+      <div><strong>Payment:</strong> Cash</div>
+      <div><strong>Received by:</strong> Kumar</div>
+      <div style="margin-top: 15px;">
+        <strong>Note:</strong> No warranty on brake parts. All sales final.<br>
+        Goods once sold will not be taken back.
+      </div>
+    </div>
+
+    <div style="text-align: right; margin-top: 40px; clear: both;">
+      <div style="border-top: 1px solid #000; display: inline-block; padding-top: 5px;">
+        Signature
+      </div>
+    </div>
+  </div>
+</body>
+</html>

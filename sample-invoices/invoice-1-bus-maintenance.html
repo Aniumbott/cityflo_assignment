@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Tax Invoice - Ashok Motors Service Center</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 20px;
+      color: #333;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 3px solid #d97706;
+      padding-bottom: 20px;
+      margin-bottom: 30px;
+    }
+    .company-name {
+      font-size: 26px;
+      font-weight: bold;
+      color: #d97706;
+      margin-bottom: 8px;
+    }
+    .company-tagline {
+      color: #6b7280;
+      font-size: 13px;
+      margin-bottom: 15px;
+    }
+    .invoice-title {
+      font-size: 32px;
+      font-weight: bold;
+      color: #92400e;
+      text-align: right;
+    }
+    .info-section {
+      margin: 25px 0;
+    }
+    .section-title {
+      font-weight: bold;
+      font-size: 14px;
+      color: #92400e;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+    }
+    th {
+      background-color: #d97706;
+      color: white;
+      padding: 12px 10px;
+      text-align: left;
+      font-size: 13px;
+    }
+    td {
+      padding: 10px;
+      border-bottom: 1px solid #e5e7eb;
+      font-size: 14px;
+    }
+    .text-right {
+      text-align: right;
+    }
+    .totals-table {
+      margin-left: auto;
+      width: 350px;
+      margin-top: 20px;
+    }
+    .totals-table td {
+      padding: 8px 10px;
+    }
+    .grand-total {
+      font-size: 18px;
+      font-weight: bold;
+      background-color: #fef3c7;
+      border-top: 2px solid #d97706;
+    }
+    .terms-box {
+      background-color: #fef3c7;
+      padding: 15px;
+      border-left: 4px solid #d97706;
+      margin: 25px 0;
+      font-size: 13px;
+    }
+    .footer {
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 2px solid #e5e7eb;
+      font-size: 12px;
+      color: #6b7280;
+    }
+    .stamp-area {
+      text-align: right;
+      margin-top: 30px;
+      font-size: 12px;
+      color: #6b7280;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div>
+      <div class="company-name">Ashok Motors Service Center</div>
+      <div class="company-tagline">Authorized Service Partner - Ashok Leyland & Tata Motors</div>
+      <div style="font-size: 13px; line-height: 1.6;">
+        Plot No. 45, Industrial Area, Phase-2<br>
+        Peenya, Bangalore - 560058, Karnataka<br>
+        <strong>GSTIN:</strong> 29AACCA1234R1Z5<br>
+        <strong>Phone:</strong> +91-80-2839-4567<br>
+        <strong>Email:</strong> billing@ashokmotors.in
+      </div>
+    </div>
+    <div>
+      <div class="invoice-title">TAX INVOICE</div>
+      <div style="margin-top: 20px; text-align: right; font-size: 14px;">
+        <strong>Invoice No:</strong> AM/BLR/2024/0342<br>
+        <strong>Date:</strong> 18-Jan-2024<br>
+        <strong>Due Date:</strong> 17-Feb-2024
+      </div>
+    </div>
+  </div>
+
+  <div class="info-section">
+    <div class="section-title">Bill To:</div>
+    <div style="font-size: 14px; line-height: 1.6;">
+      <strong>Cityflo Mobility Solutions Pvt Ltd</strong><br>
+      3rd Floor, Prestige Meridian, MG Road<br>
+      Bangalore - 560001, Karnataka<br>
+      <strong>GSTIN:</strong> 29AACCT5678P1Z2
+    </div>
+  </div>
+
+  <div class="info-section">
+    <div class="section-title">Vehicle Details:</div>
+    <div style="font-size: 14px;">
+      <strong>Bus Registration:</strong> KA-01-FC-7845 | <strong>Fleet ID:</strong> CFB-089 | <strong>Make/Model:</strong> Tata LP 410/40 Starbus
+    </div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 50%;">Description</th>
+        <th class="text-right" style="width: 10%;">HSN/SAC</th>
+        <th class="text-right" style="width: 10%;">Qty</th>
+        <th class="text-right" style="width: 15%;">Rate</th>
+        <th class="text-right" style="width: 15%;">Amount</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Major Engine Overhaul - Complete Strip & Rebuild<br><span style="font-size: 12px; color: #6b7280;">Includes gasket set, piston rings, bearings</span></td>
+        <td class="text-right">8708</td>
+        <td class="text-right">1</td>
+        <td class="text-right">₹48,500.00</td>
+        <td class="text-right">₹48,500.00</td>
+      </tr>
+      <tr>
+        <td>Air Brake System Repair & Testing<br><span style="font-size: 12px; color: #6b7280;">Compressor rebuild, valve replacement</span></td>
+        <td class="text-right">8708</td>
+        <td class="text-right">1</td>
+        <td class="text-right">₹15,800.00</td>
+        <td class="text-right">₹15,800.00</td>
+      </tr>
+      <tr>
+        <td>Front Axle Wheel Bearings - Set of 4<br><span style="font-size: 12px; color: #6b7280;">SKF Brand, OEM Grade</span></td>
+        <td class="text-right">8482</td>
+        <td class="text-right">4</td>
+        <td class="text-right">₹3,250.00</td>
+        <td class="text-right">₹13,000.00</td>
+      </tr>
+      <tr>
+        <td>Radiator Core Replacement<br><span style="font-size: 12px; color: #6b7280;">Heavy duty copper-brass radiator</span></td>
+        <td class="text-right">8708</td>
+        <td class="text-right">1</td>
+        <td class="text-right">₹12,500.00</td>
+        <td class="text-right">₹12,500.00</td>
+      </tr>
+      <tr>
+        <td>Suspension Bush Kit - Complete Set<br><span style="font-size: 12px; color: #6b7280;">Front & rear, polyurethane bushes</span></td>
+        <td class="text-right">4016</td>
+        <td class="text-right">1</td>
+        <td class="text-right">₹8,900.00</td>
+        <td class="text-right">₹8,900.00</td>
+      </tr>
+      <tr>
+        <td>Gear Box Oil - 20W50 (20 Liters)<br><span style="font-size: 12px; color: #6b7280;">Castrol Heavy Duty</span></td>
+        <td class="text-right">2710</td>
+        <td class="text-right">20</td>
+        <td class="text-right">₹425.00</td>
+        <td class="text-right">₹8,500.00</td>
+      </tr>
+      <tr>
+        <td>Air Filter Element - Heavy Duty<br><span style="font-size: 12px; color: #6b7280;">Genuine Tata part</span></td>
+        <td class="text-right">8421</td>
+        <td class="text-right">2</td>
+        <td class="text-right">₹1,850.00</td>
+        <td class="text-right">₹3,700.00</td>
+      </tr>
+      <tr>
+        <td>Labor Charges - Engine Overhaul & Repairs<br><span style="font-size: 12px; color: #6b7280;">3 mechanics × 2.5 days</span></td>
+        <td class="text-right">9987</td>
+        <td class="text-right">7.5</td>
+        <td class="text-right">₹2,800.00</td>
+        <td class="text-right">₹21,000.00</td>
+      </tr>
+      <tr>
+        <td>Workshop Consumables & Cleaning<br><span style="font-size: 12px; color: #6b7280;">Degreaser, waste disposal, etc.</span></td>
+        <td class="text-right">9987</td>
+        <td class="text-right">1</td>
+        <td class="text-right">₹2,500.00</td>
+        <td class="text-right">₹2,500.00</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <table class="totals-table">
+    <tr>
+      <td><strong>Subtotal:</strong></td>
+      <td class="text-right">₹1,34,400.00</td>
+    </tr>
+    <tr>
+      <td><strong>CGST @ 9%:</strong></td>
+      <td class="text-right">₹12,096.00</td>
+    </tr>
+    <tr>
+      <td><strong>SGST @ 9%:</strong></td>
+      <td class="text-right">₹12,096.00</td>
+    </tr>
+    <tr class="grand-total">
+      <td><strong>GRAND TOTAL:</strong></td>
+      <td class="text-right"><strong>₹1,58,592.00</strong></td>
+    </tr>
+  </table>
+
+  <div style="margin-top: 15px; font-size: 14px;">
+    <strong>Amount in Words:</strong> One Lakh Fifty-Eight Thousand Five Hundred Ninety-Two Rupees Only
+  </div>
+
+  <div class="terms-box">
+    <strong>Payment Terms:</strong> Net 30 Days from Invoice Date<br>
+    <strong>Warranty:</strong> 90 days on parts, 30 days on labor<br>
+    <strong>Note:</strong> Vehicle breakdown report and photos on file
+  </div>
+
+  <div class="info-section">
+    <div class="section-title">Bank Details for Payment:</div>
+    <div style="font-size: 13px; line-height: 1.6;">
+      <strong>Bank Name:</strong> State Bank of India<br>
+      <strong>Account Name:</strong> Ashok Motors Service Center<br>
+      <strong>Account Number:</strong> 37462891034<br>
+      <strong>IFSC Code:</strong> SBIN0012345<br>
+      <strong>Branch:</strong> Peenya Industrial Area, Bangalore
+    </div>
+  </div>
+
+  <div class="stamp-area">
+    <div style="margin-bottom: 50px;">For <strong>Ashok Motors Service Center</strong></div>
+    <div>_______________________</div>
+    <div style="margin-top: 5px;">Authorized Signatory</div>
+  </div>
+
+  <div class="footer">
+    <strong>Service Notes:</strong><br>
+    • Bus returned to service on 20-Jan-2024 after quality checks<br>
+    • Next recommended service: 15,000 km or 3 months (whichever earlier)<br>
+    • All replaced parts available for inspection<br>
+    <br>
+    <div style="text-align: center; margin-top: 15px;">
+      <em>Thank you for your business! For service queries: service@ashokmotors.in | 24/7 Breakdown Support: +91-80-2839-9999</em>
+    </div>
+  </div>
+</body>
+</html>

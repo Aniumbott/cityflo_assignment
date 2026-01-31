@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Quick Service Invoice</title>
+  <style>
+    body {
+      font-family: 'Courier New', monospace;
+      max-width: 700px;
+      margin: 40px auto;
+      padding: 20px;
+    }
+    .invoice {
+      border: 2px solid #000;
+      padding: 20px;
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .title {
+      font-size: 24px;
+      font-weight: bold;
+      text-decoration: underline;
+    }
+    table {
+      width: 100%;
+      margin: 20px 0;
+      border-collapse: collapse;
+    }
+    th, td {
+      border: 1px solid #000;
+      padding: 8px;
+      text-align: left;
+    }
+    th {
+      background-color: #f0f0f0;
+    }
+    .text-right {
+      text-align: right;
+    }
+    .total-section {
+      margin-top: 20px;
+      float: right;
+      width: 250px;
+    }
+    .total-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 5px 0;
+    }
+    .grand-total {
+      font-weight: bold;
+      font-size: 18px;
+      border-top: 2px solid #000;
+      margin-top: 10px;
+      padding-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="invoice">
+    <div class="header">
+      <div style="font-size: 20px; font-weight: bold;">PrintPro Services</div>
+      <div style="margin: 10px 0;">Commercial Printing & Graphics</div>
+      <div class="title">INVOICE</div>
+    </div>
+
+    <div style="margin: 20px 0;">
+      <div><strong>Invoice No:</strong> PP-2024-089</div>
+      <div><strong>Date:</strong> Jan 20, 2024</div>
+    </div>
+
+    <div style="margin: 20px 0;">
+      <strong>Customer:</strong><br>
+      Cityflo Mobility<br>
+      Bangalore
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Item Description</th>
+          <th class="text-right">Qty</th>
+          <th class="text-right">Rate</th>
+          <th class="text-right">Amount</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Business Cards - Premium Matte Finish</td>
+          <td class="text-right">2000</td>
+          <td class="text-right">₹2.50</td>
+          <td class="text-right">₹5,000.00</td>
+        </tr>
+        <tr>
+          <td>Letterheads - A4 Size, 100 GSM</td>
+          <td class="text-right">500</td>
+          <td class="text-right">₹8.00</td>
+          <td class="text-right">₹4,000.00</td>
+        </tr>
+        <tr>
+          <td>Company Brochures - Tri-fold, Glossy</td>
+          <td class="text-right">1000</td>
+          <td class="text-right">₹15.00</td>
+          <td class="text-right">₹15,000.00</td>
+        </tr>
+        <tr>
+          <td>Design & Layout Charges</td>
+          <td class="text-right">-</td>
+          <td class="text-right">-</td>
+          <td class="text-right">₹3,500.00</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div style="clear: both; overflow: auto;">
+      <div class="total-section">
+        <div class="total-row">
+          <span>Subtotal:</span>
+          <span>₹27,500.00</span>
+        </div>
+        <div class="total-row">
+          <span>Tax (18%):</span>
+          <span>₹4,950.00</span>
+        </div>
+        <div class="total-row grand-total">
+          <span>Total:</span>
+          <span>₹32,450.00</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="clear: both; margin-top: 80px; padding-top: 20px; border-top: 1px dashed #000;">
+      <div><strong>Payment:</strong> Due on delivery</div>
+      <div><strong>Account:</strong> 987654321 (SBI)</div>
+    </div>
+
+    <div style="margin-top: 30px; font-size: 12px; text-align: center;">
+      Contact: 080-2345-6789 | printpro@services.com
+    </div>
+  </div>
+</body>
+</html>

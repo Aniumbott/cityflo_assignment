@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Uber Trip Receipt</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+      max-width: 600px;
+      margin: 40px auto;
+      padding: 20px;
+      background-color: #f7f7f7;
+    }
+    .receipt {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+    .header {
+      background: linear-gradient(90deg, #000 0%, #333 100%);
+      color: white;
+      padding: 30px 25px;
+      text-align: center;
+    }
+    .logo {
+      font-size: 36px;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    .header-subtitle {
+      font-size: 14px;
+      opacity: 0.9;
+    }
+    .content {
+      padding: 25px;
+    }
+    .receipt-title {
+      font-size: 22px;
+      font-weight: 600;
+      margin-bottom: 20px;
+      color: #333;
+    }
+    .info-section {
+      margin: 20px 0;
+      padding: 15px;
+      background-color: #f8f9fa;
+      border-radius: 6px;
+    }
+    .label {
+      font-size: 11px;
+      color: #757575;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 5px;
+    }
+    .value {
+      font-size: 15px;
+      color: #1a1a1a;
+      font-weight: 500;
+      margin-bottom: 12px;
+    }
+    .route-container {
+      margin: 25px 0;
+      padding: 20px;
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+      border-radius: 8px;
+    }
+    .route-point {
+      display: flex;
+      align-items: flex-start;
+      margin: 15px 0;
+    }
+    .route-icon {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      margin-right: 15px;
+      flex-shrink: 0;
+      margin-top: 3px;
+    }
+    .pickup-icon {
+      background-color: #10b981;
+      box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.2);
+    }
+    .dropoff-icon {
+      background-color: #ef4444;
+      box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.2);
+    }
+    .route-label {
+      font-size: 12px;
+      color: #757575;
+      text-transform: uppercase;
+      margin-bottom: 3px;
+    }
+    .route-address {
+      font-size: 14px;
+      color: #1a1a1a;
+      line-height: 1.4;
+    }
+    .trip-stats {
+      display: flex;
+      gap: 20px;
+      margin-top: 15px;
+      padding-top: 15px;
+      border-top: 1px solid #dee2e6;
+    }
+    .stat {
+      flex: 1;
+    }
+    .fare-breakdown {
+      margin: 25px 0;
+    }
+    .fare-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 15px;
+      color: #333;
+    }
+    .fare-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid #e9ecef;
+      font-size: 14px;
+    }
+    .fare-total {
+      display: flex;
+      justify-content: space-between;
+      padding: 15px 0;
+      font-size: 20px;
+      font-weight: 700;
+      color: #000;
+      border-top: 2px solid #333;
+      margin-top: 10px;
+    }
+    .payment-method {
+      background-color: #f8f9fa;
+      padding: 15px;
+      border-radius: 6px;
+      margin: 20px 0;
+      font-size: 14px;
+    }
+    .footer {
+      background-color: #f8f9fa;
+      padding: 20px 25px;
+      border-top: 1px solid #e9ecef;
+      font-size: 12px;
+      color: #757575;
+      text-align: center;
+      line-height: 1.6;
+    }
+    .business-purpose {
+      background-color: #fef3c7;
+      border-left: 4px solid #f59e0b;
+      padding: 12px 15px;
+      margin: 20px 0;
+      border-radius: 4px;
+    }
+    .business-purpose-title {
+      font-weight: 600;
+      color: #92400e;
+      margin-bottom: 5px;
+      font-size: 13px;
+    }
+    .business-purpose-text {
+      color: #78350f;
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+  <div class="receipt">
+    <div class="header">
+      <div class="logo">Uber</div>
+      <div class="header-subtitle">Thanks for riding with Uber</div>
+    </div>
+
+    <div class="content">
+      <div class="receipt-title">Trip Receipt</div>
+
+      <div class="info-section">
+        <div class="label">Receipt Number</div>
+        <div class="value">UBER-IN-BLR-20240123-9847</div>
+
+        <div class="label">Trip Date & Time</div>
+        <div class="value">Tuesday, January 23, 2024 at 2:45 PM</div>
+
+        <div class="label">Driver</div>
+        <div class="value">Prakash Kumar • KA-05-MH-8921 (Toyota Innova Crysta)</div>
+      </div>
+
+      <div class="route-container">
+        <div class="route-point">
+          <div class="route-icon pickup-icon"></div>
+          <div>
+            <div class="route-label">Picked up</div>
+            <div class="route-address">Kempegowda International Airport, Terminal 1, Devanahalli, Bangalore 560300</div>
+            <div style="font-size: 12px; color: #757575; margin-top: 3px;">2:45 PM</div>
+          </div>
+        </div>
+
+        <div class="route-point">
+          <div class="route-icon dropoff-icon"></div>
+          <div>
+            <div class="route-label">Dropped off</div>
+            <div class="route-address">Cityflo Head Office, Prestige Meridian, 3rd Floor, MG Road, Bangalore 560001</div>
+            <div style="font-size: 12px; color: #757575; margin-top: 3px;">4:12 PM</div>
+          </div>
+        </div>
+
+        <div class="trip-stats">
+          <div class="stat">
+            <div class="label">Distance</div>
+            <div class="value">38.6 km</div>
+          </div>
+          <div class="stat">
+            <div class="label">Duration</div>
+            <div class="value">1h 27m</div>
+          </div>
+          <div class="stat">
+            <div class="label">Ride Type</div>
+            <div class="value">Uber Premier</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="business-purpose">
+        <div class="business-purpose-title">🏢 BUSINESS TRIP</div>
+        <div class="business-purpose-text">
+          <strong>Purpose:</strong> Airport pickup - Returning from vendor meeting at Mumbai (Flight 6E-456)<br>
+          <strong>Employee:</strong> Rajesh Sharma (Fleet Operations Manager)<br>
+          <strong>Approved by:</strong> Suresh Rajan (VP Operations)
+        </div>
+      </div>
+
+      <div class="fare-breakdown">
+        <div class="fare-title">Fare Breakdown</div>
+
+        <div class="fare-item">
+          <span>Base Fare</span>
+          <span>₹180.00</span>
+        </div>
+
+        <div class="fare-item">
+          <span>Distance (38.6 km × ₹22/km)</span>
+          <span>₹849.20</span>
+        </div>
+
+        <div class="fare-item">
+          <span>Time (87 min × ₹2.50/min)</span>
+          <span>₹217.50</span>
+        </div>
+
+        <div class="fare-item">
+          <span>Airport Access Fee</span>
+          <span>₹95.00</span>
+        </div>
+
+        <div class="fare-item">
+          <span>Waiting Time (12 minutes)</span>
+          <span>₹36.00</span>
+        </div>
+
+        <div class="fare-item">
+          <span>Service Fee</span>
+          <span>₹45.00</span>
+        </div>
+
+        <div class="fare-item">
+          <span>Surge Pricing (1.2x - High Demand)</span>
+          <span>₹284.54</span>
+        </div>
+
+        <div class="fare-item" style="border-bottom: none;">
+          <span>GST @ 5%</span>
+          <span>₹80.36</span>
+        </div>
+
+        <div class="fare-total">
+          <span>Total Charged</span>
+          <span>₹1,787.60</span>
+        </div>
+      </div>
+
+      <div class="payment-method">
+        <div class="label">Payment Method</div>
+        <div class="value">Cityflo Corporate Account (•••• 8467)</div>
+
+        <div class="label">Transaction ID</div>
+        <div class="value">TXN-2024-01-23-BLR-9847-UBER</div>
+
+        <div class="label">Card Type</div>
+        <div class="value">American Express Corporate Card</div>
+      </div>
+
+      <div class="info-section">
+        <div class="label">Invoice Details</div>
+        <div style="font-size: 13px; line-height: 1.6;">
+          <strong>Billed to:</strong> Cityflo Mobility Solutions Pvt Ltd<br>
+          <strong>Address:</strong> MG Road, Bangalore 560001<br>
+          <strong>GSTIN:</strong> 29AACCT5678P1Z2<br>
+          <strong>Corporate Account ID:</strong> UBER-CORP-BLR-4589
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <strong>Uber India Systems Private Limited</strong><br>
+      Embassy Tech Village, Devarabisanahalli, Outer Ring Road<br>
+      Bangalore 560103, Karnataka, India<br>
+      GSTIN: 29AABCU9603R1ZM | CIN: U63090KA2011PTC066605<br>
+      <br>
+      Questions about this trip? Visit <strong>help.uber.com</strong> or call <strong>1800-208-4554</strong><br>
+      This is a digitally generated receipt and does not require a signature.
+    </div>
+  </div>
+</body>
+</html>

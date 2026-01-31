@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Taxi Receipt - Uber</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 600px;
+      margin: 40px auto;
+      padding: 20px;
+      background-color: #f9fafb;
+    }
+    .receipt {
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+      border-bottom: 2px solid #000;
+      padding-bottom: 20px;
+    }
+    .logo {
+      font-size: 32px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    .receipt-title {
+      font-size: 24px;
+      font-weight: bold;
+      margin-top: 15px;
+    }
+    .section {
+      margin: 20px 0;
+    }
+    .label {
+      color: #6b7280;
+      font-size: 12px;
+      text-transform: uppercase;
+      margin-bottom: 5px;
+    }
+    .value {
+      font-size: 16px;
+      font-weight: 500;
+      margin-bottom: 15px;
+    }
+    .trip-details {
+      background-color: #f3f4f6;
+      padding: 15px;
+      border-radius: 6px;
+      margin: 20px 0;
+    }
+    .route {
+      display: flex;
+      align-items: center;
+      margin: 10px 0;
+    }
+    .route-marker {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      margin-right: 10px;
+      flex-shrink: 0;
+    }
+    .start-marker {
+      background-color: #10b981;
+    }
+    .end-marker {
+      background-color: #ef4444;
+    }
+    .fare-breakdown {
+      margin: 20px 0;
+    }
+    .fare-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    .total-row {
+      font-size: 20px;
+      font-weight: bold;
+      margin-top: 15px;
+      padding-top: 15px;
+      border-top: 2px solid #000;
+    }
+    .footer {
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 1px solid #e5e7eb;
+      text-align: center;
+      font-size: 12px;
+      color: #6b7280;
+    }
+  </style>
+</head>
+<body>
+  <div class="receipt">
+    <div class="header">
+      <div class="logo">Uber</div>
+      <div style="color: #6b7280;">Your Trip Receipt</div>
+      <div class="receipt-title">RECEIPT</div>
+    </div>
+
+    <div class="section">
+      <div class="label">Receipt Number</div>
+      <div class="value">UBER-BLR-20240125-7834</div>
+
+      <div class="label">Date & Time</div>
+      <div class="value">January 25, 2024 at 9:15 AM</div>
+
+      <div class="label">Driver</div>
+      <div class="value">Rajesh Kumar - Toyota Innova (KA-01-AB-1234)</div>
+    </div>
+
+    <div class="trip-details">
+      <div style="font-weight: bold; margin-bottom: 15px;">Trip Details</div>
+
+      <div class="route">
+        <div class="route-marker start-marker"></div>
+        <div>
+          <div style="font-weight: 500;">Pickup</div>
+          <div style="font-size: 14px; color: #6b7280;">Cityflo Office, MG Road, Bangalore</div>
+        </div>
+      </div>
+
+      <div class="route">
+        <div class="route-marker end-marker"></div>
+        <div>
+          <div style="font-weight: 500;">Drop-off</div>
+          <div style="font-size: 14px; color: #6b7280;">Kempegowda International Airport, Bangalore</div>
+        </div>
+      </div>
+
+      <div style="margin-top: 15px; display: flex; gap: 30px;">
+        <div>
+          <div class="label">Distance</div>
+          <div style="font-weight: 500;">42.3 km</div>
+        </div>
+        <div>
+          <div class="label">Duration</div>
+          <div style="font-weight: 500;">58 minutes</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="fare-breakdown">
+      <div style="font-weight: bold; margin-bottom: 10px;">Fare Breakdown</div>
+
+      <div class="fare-row">
+        <span>Base Fare</span>
+        <span>₹150.00</span>
+      </div>
+
+      <div class="fare-row">
+        <span>Distance (42.3 km × ₹18/km)</span>
+        <span>₹761.40</span>
+      </div>
+
+      <div class="fare-row">
+        <span>Time (58 min × ₹2/min)</span>
+        <span>₹116.00</span>
+      </div>
+
+      <div class="fare-row">
+        <span>Service Fee</span>
+        <span>₹25.00</span>
+      </div>
+
+      <div class="fare-row">
+        <span>Waiting Charge</span>
+        <span>₹20.00</span>
+      </div>
+
+      <div class="fare-row">
+        <span>GST (5%)</span>
+        <span>₹53.62</span>
+      </div>
+
+      <div class="fare-row total-row">
+        <span>Total Paid</span>
+        <span>₹1,126.02</span>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="label">Payment Method</div>
+      <div class="value">Company Credit Card (•••• 4567)</div>
+
+      <div class="label">Transaction ID</div>
+      <div class="value">TXN-2024012509157834</div>
+    </div>
+
+    <div class="footer">
+      <div style="font-weight: bold; margin-bottom: 10px;">Uber India Systems Pvt Ltd</div>
+      <div>Embassy Tech Village, Devarabisanahalli, Bangalore 560103</div>
+      <div>GSTIN: 29AABCU9603R1ZM</div>
+      <div style="margin-top: 15px;">Questions? Visit help.uber.com</div>
+    </div>
+  </div>
+</body>
+</html>

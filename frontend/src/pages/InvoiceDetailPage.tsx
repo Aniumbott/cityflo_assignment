@@ -75,6 +75,14 @@ export default function InvoiceDetailPage() {
     queryKey: ['invoice', id],
     queryFn: () => getInvoice(id!),
     enabled: !!id,
+    refetchInterval: (query) => {
+      // Poll every 2 seconds while extraction is in progress
+      const invoice = query.state.data?.invoice;
+      if (invoice?.extractionStatus === 'PENDING' || invoice?.extractionStatus === 'PROCESSING') {
+        return 2000;
+      }
+      return false;
+    },
   });
 
   function formatDate(dateStr: string | null): string {

@@ -323,6 +323,45 @@ openapi.yaml                       # NEW: Complete OpenAPI 3.0 specification (18
 sample-invoices/README.md          # NEW: Sample invoice testing guide
 ```
 
+### Phase 11: Analytics Dashboard -- COMPLETED
+
+- [x] **Backend Analytics API**:
+    - [x] Created `/api/analytics/stats` endpoint (ACCOUNTS/SENIOR_ACCOUNTS only).
+    - [x] Aggregated statistics: total invoices, status counts, total amount, avg processing time.
+    - [x] Category breakdown (VENDOR_PAYMENT vs REIMBURSEMENT).
+    - [x] Status timeline (submissions over last 30 days).
+    - [x] Recent invoices list.
+    - [x] Date range and category filters support.
+    - [x] Added `requireRoles` middleware for role-based route protection.
+- [x] **Frontend Analytics Dashboard**:
+    - [x] Installed Recharts library for data visualization.
+    - [x] Created comprehensive AnalyticsPage component.
+    - [x] **Overview Stats Cards**: 7 cards showing key metrics (total, pending, approved, rejected, paid, amount, processing time).
+    - [x] **Interactive Filters**: Date range (start/end) and category dropdown with clear filters button.
+    - [x] **Status Distribution Pie Chart**: Visual breakdown of invoice statuses with Cityflo colors.
+    - [x] **Submissions Over Time Line Chart**: 30-day trend with brand yellow line.
+    - [x] **Category Breakdown Pie Chart**: VENDOR_PAYMENT vs REIMBURSEMENT distribution.
+    - [x] **Recent Invoices List**: Top 5 recent invoices with vendor, amount, and status.
+    - [x] **Cityflo Color Palette**: Yellow (#FFC72C) brand color + semantic colors (green, red, blue, purple).
+    - [x] **Dark Mode Support**: All charts and stats cards adapt to dark theme.
+    - [x] **Loading & Error States**: Spinner and error handling.
+    - [x] Currency formatting (INR) and duration formatting (hours/days).
+- [x] **Navigation & Routing**:
+    - [x] Added `/analytics` route (protected, ACCOUNTS/SENIOR_ACCOUNTS only).
+    - [x] Added Analytics nav link in sidebar with BarChart3 icon.
+
+**Key files created/modified in Phase 11:**
+```
+backend/src/middleware/auth.ts                 # (modified) Added requireRoles middleware
+backend/src/routes/analytics.ts                # NEW: Analytics API endpoint with aggregated stats
+backend/src/index.ts                           # (modified) Registered analytics routes
+frontend/src/types/index.ts                    # (modified) Added analytics types (AnalyticsOverview, CategoryBreakdown, TimelineDataPoint, etc.)
+frontend/src/api/analytics.ts                  # NEW: getAnalyticsStats API function
+frontend/src/pages/AnalyticsPage.tsx           # NEW: Full analytics dashboard with charts, filters, stats cards
+frontend/src/components/Layout.tsx             # (modified) Added Analytics nav link for accounts team
+frontend/src/App.tsx                           # (modified) Added /analytics route
+```
+
 ---
 
 ## Folder Structure Update (Frontend)
@@ -348,20 +387,20 @@ cityflow_assignment/
 ## Additional Features
 
 ### Priority (Implementing these 4):
-1. **Duplicate Detection** - Warning banner on review page.
-2. **Audit Log** - **Visualized as a "Bus Route" vertical timeline.**
-3. **Bulk Operations** - Floating bottom bar.
-4. **OCR Confidence Score** - Color-coded indicators.
+1. **Duplicate Detection** - ✅ Warning banner on review page (COMPLETED).
+2. **Audit Log** - ✅ **Visualized as a "Bus Route" vertical timeline** (COMPLETED).
+3. **OCR Confidence Score** - ✅ Color-coded indicators (COMPLETED).
+4. **Analytics Dashboard** - ✅ Charts (Recharts) with Cityflo Yellow palette (COMPLETED).
 
 ### Stretch (if time permits):
 5. **Approval Workflow** - Two-level approval.
-6. **Analytics Dashboard** - Charts (Recharts) with Cityflo Yellow palette.
+6. **Bulk Operations** - ✅ Floating bottom bar (COMPLETED, moved from priority).
 
 ---
 
 ## 🎉 PROJECT COMPLETION SUMMARY
 
-### ✅ All Phases Complete (1-10)
+### ✅ All Phases Complete (1-11)
 
 **Phases 1-5**: Backend Implementation ✅
 - Authentication (JWT + refresh tokens)
@@ -391,10 +430,18 @@ cityflow_assignment/
 
 **Phase 10**: Documentation & Deployment ✅
 - Comprehensive README.md
-- API documentation
+- API documentation (OpenAPI spec)
 - Deployment guides
 - Sample invoice directory
 - .env.example template
+
+**Phase 11**: Analytics Dashboard ✅
+- Backend analytics API with aggregated stats
+- Interactive charts with Recharts (pie, line)
+- Overview stats cards (7 metrics)
+- Date range and category filters
+- Cityflo color palette integration
+- Dark mode support for all charts
 
 ---
 
@@ -405,12 +452,12 @@ cityflow_assignment/
 | **Frontend Tests** | 70 passing |
 | **Backend Tests** | 51 passing |
 | **Total Tests** | **131 passing** |
-| **Frontend Pages** | 6 (Login, Upload, Submissions, Invoice Detail, All Invoices, Invoice Review) |
-| **API Endpoints** | 18 (auth, invoices, notifications, audit) |
+| **Frontend Pages** | 7 (Login, Upload, Submissions, Invoice Detail, All Invoices, Invoice Review, Analytics) |
+| **API Endpoints** | 19 (auth, invoices, notifications, audit, analytics) |
 | **Database Tables** | 6 (users, invoices, extracted_data, line_items, invoice_actions, notifications) |
 | **UI Components** | 15+ (Button, Card, ThemeToggle, NotificationPanel, Layout, etc.) |
-| **TypeScript Types** | 35+ interfaces/types |
-| **Lines of Code** | ~8,000+ (frontend + backend) |
+| **TypeScript Types** | 40+ interfaces/types |
+| **Lines of Code** | ~9,000+ (frontend + backend) |
 
 ---
 
@@ -420,6 +467,16 @@ cityflow_assignment/
 ✅ **Audit Log** - "Bus Route" vertical timeline visualization
 ✅ **Bulk Operations** - Floating action bar with approve/reject
 ✅ **OCR Confidence Score** - Green/Yellow/Red dots next to extracted fields
+✅ **Analytics Dashboard** - Comprehensive analytics with Recharts visualization
+  - Overview stats cards (total invoices, pending, approved, rejected, paid, total amount, avg processing time)
+  - Status distribution pie chart
+  - Submissions over time line chart
+  - Category breakdown pie chart
+  - Recent invoices list
+  - Date range and category filters
+  - Cityflo Yellow color palette (#FFC72C)
+  - Backend analytics endpoint (`GET /api/analytics/stats`)
+  - Role-based access (ACCOUNTS, SENIOR_ACCOUNTS only)
 
 ---
 

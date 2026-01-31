@@ -11,6 +11,7 @@ info:
     - AI-powered PDF extraction via Google Gemini
     - Real-time notifications
     - Audit logging
+    - Analytics dashboard with aggregated statistics
 
     **Authentication:**
     Most endpoints require a JWT access token in the Authorization header:
@@ -39,6 +40,8 @@ tags:
     description: Invoice CRUD operations, status updates, and exports
   - name: Notifications
     description: User notification management
+  - name: Analytics
+    description: Aggregated statistics and insights
   - name: Audit
     description: Audit log access
   - name: Health
@@ -683,6 +686,117 @@ paths:
                   updated:
                     type: integer
                     description: Number of notifications updated
+
+  /analytics/stats:
+    get:
+      tags:
+        - Analytics
+      summary: Get aggregated analytics statistics
+      description: |
+        Get comprehensive analytics data including overview stats, category breakdown,
+        status timeline, and recent invoices. Supports filtering by date range and category.
+        Only accessible by ACCOUNTS and SENIOR_ACCOUNTS roles.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: startDate
+          in: query
+          schema:
+            type: string
+            format: date
+          description: Filter invoices created on or after this date (ISO 8601 format)
+          example: "2024-01-01"
+        - name: endDate
+          in: query
+          schema:
+            type: string
+            format: date
+          description: Filter invoices created on or before this date (ISO 8601 format)
+          example: "2024-12-31"
+        - name: category
+          in: query
+          schema:
+            type: string
+            enum: [VENDOR_PAYMENT, REIMBURSEMENT]
+          description: Filter by invoice category
+      responses:
+        '200':
+          description: Analytics data retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  overview:
+                    type: object
+                    properties:
+                      totalInvoices:
+                        type: integer
+                        description: Total number of invoices
+                      pendingCount:
+                        type: integer
+                        description: Number of pending invoices
+                      approvedCount:
+                        type: integer
+                        description: Number of approved invoices
+                      rejectedCount:
+                        type: integer
+                        description: Number of rejected invoices
+                      paidCount:
+                        type: integer
+                        description: Number of paid invoices
+                      totalAmount:
+                        type: number
+                        description: Total amount processed (sum of all grand totals)
+                      avgProcessingTimeMs:
+                        type: integer
+                        description: Average processing time in milliseconds
+                  categoryBreakdown:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        category:
+                          type: string
+                          enum: [VENDOR_PAYMENT, REIMBURSEMENT]
+                        count:
+                          type: integer
+                  statusTimeline:
+                    type: array
+                    description: Submissions over time (last 30 days)
+                    items:
+                      type: object
+                      properties:
+                        date:
+                          type: string
+                          format: date
+                        count:
+                          type: integer
+                  recentInvoices:
+                    type: array
+                    description: Top 5 most recent invoices
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        filename:
+                          type: string
+                        status:
+                          type: string
+                          enum: [PENDING_REVIEW, APPROVED, REJECTED, PAID]
+                        vendor:
+                          type: string
+                        amount:
+                          type: number
+                          nullable: true
+                        createdAt:
+                          type: string
+                          format: date-time
+        '401':
+          description: Unauthorized - Invalid or missing JWT token
+        '403':
+          description: Forbidden - Insufficient permissions (requires ACCOUNTS or SENIOR_ACCOUNTS role)
 
   /health:
     get:

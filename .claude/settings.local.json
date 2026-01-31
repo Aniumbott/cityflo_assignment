@@ -21,7 +21,10 @@
       "Bash(npm run dev:*)",
       "Bash(test:*)",
       "Bash(npm run prisma:migrate:*)",
-      "Bash(psql:*)"
+      "Bash(psql:*)",
+      "Bash(render:*)",
+      "Bash(npm run test)",
+      "Bash(npm run test:*)"
     ]
   }
 }

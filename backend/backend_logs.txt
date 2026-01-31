@@ -1,0 +1,15 @@
+
+> cityflo-invoice-backend@1.0.0 dev
+> tsx watch src/index.ts
+
+[dotenv@17.2.3] injecting env (9) from ..\.env -- tip: 👥 sync secrets across teammates & machines: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  load multiple .env files with { path: ['.env.local', '.env'] }
+📚 Swagger UI available at /api-docs
+Server running on port 3000
+Environment: development
+12:49:47 PM [tsx] change in ./src\services\gemini.ts Rerunning...
+c[dotenv@17.2.3] injecting env (9) from ..\.env -- tip: 🔐 prevent committing .env to code: https://dotenvx.com/precommit
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🛠️  run anywhere with `dotenvx run -- yourcommand`
+📚 Swagger UI available at /api-docs
+Server running on port 3000
+Environment: development

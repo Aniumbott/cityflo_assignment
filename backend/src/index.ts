@@ -11,6 +11,7 @@ import { config } from './config';
 import authRoutes from './routes/auth';
 import invoiceRoutes from './routes/invoices';
 import notificationRoutes from './routes/notifications';
+import analyticsRoutes from './routes/analytics';
 
 const app = express();
 
@@ -61,6 +62,7 @@ if (fs.existsSync(openApiPath)) {
 app.use('/api/auth', authRoutes);
 app.use('/api/invoices', invoiceRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/analytics', analyticsRoutes);
 
 // Error handling middleware
 app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {

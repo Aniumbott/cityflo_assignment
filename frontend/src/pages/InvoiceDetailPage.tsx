@@ -13,7 +13,6 @@ import {
   Loader2,
   AlertTriangle,
   Calendar,
-  Hash,
   Building2,
   CreditCard,
   Receipt,
@@ -287,7 +286,7 @@ export default function InvoiceDetailPage() {
             <div className="absolute left-[15px] top-2 bottom-2 w-px border-l-2 border-dashed border-border-light dark:border-border-dark" />
 
             <div className="space-y-4">
-              {[...invoice.actions].reverse().map((action, index) => {
+              {[...invoice.actions].reverse().map((action) => {
                 const config = ACTION_CONFIG[action.action];
                 return (
                   <div key={action.id} className="relative flex gap-3.5 items-start" role="listitem">

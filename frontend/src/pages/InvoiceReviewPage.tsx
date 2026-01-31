@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
@@ -23,7 +23,7 @@ import {
 } from 'lucide-react';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
-import { getInvoice, updateInvoiceStatus, editExtractedData, getPdfUrl } from '../api/invoices';
+import { getInvoice, updateInvoiceStatus, editExtractedData, fetchPdfBlob } from '../api/invoices';
 import type { InvoiceStatus, InvoiceActionType, ExtractionStatus, ExtractedData } from '../types';
 import toast from 'react-hot-toast';
 
@@ -94,6 +94,7 @@ export default function InvoiceReviewPage() {
   const [isEditing, setIsEditing] = useState(false);
   const [rejectComment, setRejectComment] = useState('');
   const [showRejectModal, setShowRejectModal] = useState(false);
+  const [pdfBlobUrl, setPdfBlobUrl] = useState<string | null>(null);
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ['invoice', id],
@@ -127,6 +128,29 @@ export default function InvoiceReviewPage() {
       toast.error('Failed to save changes');
     },
   });
+
+  // Fetch PDF blob with authentication
+  useEffect(() => {
+    if (!id) return;
+
+    let objectUrl: string | null = null;
+
+    fetchPdfBlob(id)
+      .then((blob) => {
+        objectUrl = URL.createObjectURL(blob);
+        setPdfBlobUrl(objectUrl);
+      })
+      .catch((error) => {
+        console.error('Failed to load PDF:', error);
+        toast.error('Failed to load PDF preview');
+      });
+
+    return () => {
+      if (objectUrl) {
+        URL.revokeObjectURL(objectUrl);
+      }
+    };
+  }, [id]);
 
   function formatDate(dateStr: string | null): string {
     if (!dateStr) return '--';
@@ -191,7 +215,6 @@ export default function InvoiceReviewPage() {
   const ed = invoice.extractedData;
   const isPending = invoice.status === 'PENDING_REVIEW';
   const isApproved = invoice.status === 'APPROVED';
-  const pdfUrl = getPdfUrl(invoice.id);
 
   return (
     <div>
@@ -247,11 +270,17 @@ export default function InvoiceReviewPage() {
             </h2>
           </div>
           <div className="bg-zinc-100 dark:bg-zinc-950">
-            <iframe
-              src={pdfUrl}
-              title="Invoice PDF"
-              className="w-full h-[600px] border-0"
-            />
+            {pdfBlobUrl ? (
+              <iframe
+                src={pdfBlobUrl}
+                title="Invoice PDF"
+                className="w-full h-[600px] border-0"
+              />
+            ) : (
+              <div className="w-full h-[600px] flex items-center justify-center">
+                <Loader2 className="h-8 w-8 animate-spin text-brand" />
+              </div>
+            )}
           </div>
         </Card>
 

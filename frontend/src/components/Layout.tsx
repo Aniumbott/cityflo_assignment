@@ -6,6 +6,7 @@ import {
   Upload,
   ClipboardList,
   FolderOpen,
+  BarChart3,
   LogOut,
   Menu,
   X,
@@ -38,6 +39,12 @@ const navItems: NavItem[] = [
     label: 'All Invoices',
     to: '/invoices',
     icon: <FolderOpen className="h-5 w-5" />,
+    roles: ['ACCOUNTS', 'SENIOR_ACCOUNTS'],
+  },
+  {
+    label: 'Analytics',
+    to: '/analytics',
+    icon: <BarChart3 className="h-5 w-5" />,
     roles: ['ACCOUNTS', 'SENIOR_ACCOUNTS'],
   },
 ];

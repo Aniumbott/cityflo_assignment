@@ -1,8 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { Bell, Check, CheckCheck, Clock, FileText, X } from 'lucide-react';
-import Button from './ui/Button';
+import { Bell, CheckCheck, Clock, FileText, X } from 'lucide-react';
 import Card from './ui/Card';
 import { listNotifications, markNotificationRead, markAllNotificationsRead } from '../api/notifications';
 import type { Notification as NotificationType } from '../types';

@@ -78,3 +78,10 @@ export function getExportCsvUrl(params?: InvoiceListParams): string {
 export function getPdfUrl(id: string): string {
   return `/api/invoices/${id}/pdf`;
 }
+
+export async function fetchPdfBlob(id: string): Promise<Blob> {
+  const { data } = await api.get(`/invoices/${id}/pdf`, {
+    responseType: 'blob',
+  });
+  return data;
+}

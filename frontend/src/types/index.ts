@@ -216,3 +216,46 @@ export interface MarkNotificationReadResponse {
 export interface MarkAllReadResponse {
   updated: number;
 }
+
+// Analytics types
+export interface AnalyticsOverview {
+  totalInvoices: number;
+  pendingCount: number;
+  approvedCount: number;
+  rejectedCount: number;
+  paidCount: number;
+  totalAmount: number;
+  avgProcessingTimeMs: number;
+}
+
+export interface CategoryBreakdown {
+  category: InvoiceCategory;
+  count: number;
+}
+
+export interface TimelineDataPoint {
+  date: string;
+  count: number;
+}
+
+export interface RecentInvoice {
+  id: string;
+  filename: string;
+  status: InvoiceStatus;
+  vendor: string;
+  amount: number | null;
+  createdAt: string;
+}
+
+export interface AnalyticsStatsResponse {
+  overview: AnalyticsOverview;
+  categoryBreakdown: CategoryBreakdown[];
+  statusTimeline: TimelineDataPoint[];
+  recentInvoices: RecentInvoice[];
+}
+
+export interface AnalyticsParams {
+  startDate?: string;
+  endDate?: string;
+  category?: InvoiceCategory;
+}

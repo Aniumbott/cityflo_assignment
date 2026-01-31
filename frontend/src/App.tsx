@@ -11,6 +11,7 @@ import SubmissionsPage from './pages/SubmissionsPage';
 import InvoiceDetailPage from './pages/InvoiceDetailPage';
 import AllInvoicesPage from './pages/AllInvoicesPage';
 import InvoiceReviewPage from './pages/InvoiceReviewPage';
+import AnalyticsPage from './pages/AnalyticsPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -69,6 +70,14 @@ function App() {
                 <Route
                   path="invoices/:id"
                   element={<InvoiceDetailRouteSwitch />}
+                />
+                <Route
+                  path="analytics"
+                  element={
+                    <ProtectedRoute roles={['ACCOUNTS', 'SENIOR_ACCOUNTS']}>
+                      <AnalyticsPage />
+                    </ProtectedRoute>
+                  }
                 />
 
                 {/* Default redirect based on role handled by index */}

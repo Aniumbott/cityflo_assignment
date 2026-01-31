@@ -22,10 +22,9 @@ vi.mock('../api/invoices', () => ({
   getPdfUrl: vi.fn((id) => `/api/invoices/${id}/pdf`),
 }));
 
-import { getInvoice, updateInvoiceStatus, editExtractedData } from '../api/invoices';
+import { getInvoice, updateInvoiceStatus } from '../api/invoices';
 const mockGetInvoice = vi.mocked(getInvoice);
 const mockUpdateStatus = vi.mocked(updateInvoiceStatus);
-const mockEditData = vi.mocked(editExtractedData);
 
 // Fresh QueryClient per render to avoid cache pollution
 function renderWithProviders(ui: ReactElement) {
@@ -218,7 +217,7 @@ describe('InvoiceReviewPage', () => {
     // employee1 appears in multiple places (submitter + timeline)
     expect(screen.getAllByText(/employee1/).length).toBeGreaterThan(0);
     // Text is split across multiple elements, use a text matcher function
-    expect(screen.getByText((content, element) => {
+    expect(screen.getByText((_, element) => {
       return element?.textContent === 'employee1 submitted this invoice';
     })).toBeInTheDocument();
   });

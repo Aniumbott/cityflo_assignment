@@ -1,8 +1,8 @@
 # Cityflo Invoice Processing System
 
-A full-stack invoice management application with AI-powered PDF extraction, built for Cityflo's internal workflow. Features role-based access control, real-time notifications, and a polished dark-mode UI.
+A full-stack invoice management application with AI-powered PDF extraction, built for Cityflo's internal workflow. Features role-based access control, real-time notifications, analytics dashboard with interactive charts, and a polished dark-mode UI.
 
-![Tech Stack](https://img.shields.io/badge/React-19-blue) ![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue) ![Node.js](https://img.shields.io/badge/Node.js-Express-green) ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Prisma-blue) ![Tests](https://img.shields.io/badge/Tests-131%20passing-success)
+![Tech Stack](https://img.shields.io/badge/React-19-blue) ![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue) ![Node.js](https://img.shields.io/badge/Node.js-Express-green) ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Prisma-blue)
 
 ---
 
@@ -18,6 +18,13 @@ A full-stack invoice management application with AI-powered PDF extraction, buil
 - **Invoice Review Workspace**: Split-screen PDF viewer with editable extracted fields
 - **Confidence Indicators**: AI extraction confidence scores (green/yellow/red dots)
 - **Approve/Reject/Mark Paid**: Streamlined invoice status management with audit trail
+- **Analytics Dashboard**: Comprehensive insights with interactive charts
+  - Overview stats cards (total invoices, pending, approved, rejected, paid, total amount, avg processing time)
+  - Status distribution pie chart
+  - Submissions over time line chart
+  - Category breakdown pie chart
+  - Recent high-value invoices list
+  - Date range and category filters
 - **CSV Export**: Download filtered invoice data
 
 ### Core Capabilities
@@ -42,6 +49,7 @@ A full-stack invoice management application with AI-powered PDF extraction, buil
 | | React Query | Server state management & caching |
 | | React Router v7 | Client-side routing |
 | | Axios | HTTP client with JWT interceptors |
+| | Recharts | Data visualization & charts |
 | | Lucide Icons | Icon library |
 | **Backend** | Node.js + Express 5 + TypeScript | REST API server |
 | | Prisma v5 | Type-safe ORM |
@@ -56,6 +64,10 @@ A full-stack invoice management application with AI-powered PDF extraction, buil
 | | Render PostgreSQL | Managed database |
 
 ### Database Schema
+
+![Database ERD](docs/erd_cityflo.png)
+
+**Entity Relationship Diagram** showing the complete database structure with relationships and cascade rules.
 
 ```
 users (id, email, username, password_hash, role, created_at)
@@ -187,6 +199,12 @@ npm run test:backend     # 51 tests (Jest + Supertest)
 | `/api/notifications/:id/read` | PATCH | JWT | Mark notification as read |
 | `/api/notifications/read-all` | PATCH | JWT | Mark all notifications as read |
 
+### Analytics
+
+| Endpoint | Method | Auth | Roles | Description |
+|----------|--------|------|-------|-------------|
+| `/api/analytics/stats` | GET | JWT | ACCOUNTS, SENIOR_ACCOUNTS | Get aggregated analytics (overview stats, category breakdown, status timeline, recent invoices). Supports query params: `startDate`, `endDate`, `category` |
+
 ---
 
 ## 🎨 Design System (Cityflo Aesthetic)
@@ -220,11 +238,11 @@ The UI follows a high-contrast, rounded, mobile-first design inspired by the Cit
 cityflow_assignment/
 ├── backend/
 │   ├── src/
-│   │   ├── routes/          # API endpoints (auth, invoices, notifications, audit)
+│   │   ├── routes/          # API endpoints (auth, invoices, notifications, analytics)
 │   │   ├── middleware/      # auth, role check, error handler
 │   │   ├── services/        # gemini, extraction, notifications
 │   │   ├── lib/             # prisma client
-│   │   └── server.ts        # Express app
+│   │   └── index.ts         # Express app
 │   ├── prisma/
 │   │   ├── schema.prisma    # Database schema
 │   │   └── seed.ts          # Test users seed
@@ -233,10 +251,10 @@ cityflow_assignment/
 │   └── package.json
 ├── frontend/
 │   ├── src/
-│   │   ├── pages/           # UploadPage, SubmissionsPage, InvoiceDetailPage, AllInvoicesPage, InvoiceReviewPage, LoginPage
+│   │   ├── pages/           # LoginPage, UploadPage, SubmissionsPage, InvoiceDetailPage, AllInvoicesPage, InvoiceReviewPage, AnalyticsPage
 │   │   ├── components/      # Layout, ProtectedRoute, NotificationPanel, ui/Button, ui/Card, ui/ThemeToggle
 │   │   ├── contexts/        # AuthContext, ThemeContext
-│   │   ├── api/             # axios, auth, invoices, notifications
+│   │   ├── api/             # axios, auth, invoices, notifications, analytics
 │   │   ├── types/           # TypeScript types
 │   │   ├── test/            # test-utils, setup
 │   │   ├── App.tsx          # Router + role-based redirects
@@ -244,7 +262,7 @@ cityflow_assignment/
 │   └── package.json
 ├── .env                     # Root environment variables (DATABASE_URL, GEMINI_API_KEY, JWT secrets)
 ├── package.json             # Monorepo scripts (dev, test, build)
-├── PLAN.md                  # Detailed project plan (phases 1-10)
+├── PLAN.md                  # Detailed project plan (phases 1-11)
 └── README.md
 ```
 
@@ -328,6 +346,19 @@ cityflow_assignment/
 3. Clicks "Approve" → all selected invoices approved in one API call
 4. Notifications sent to all affected employees
 
+### 4. Analytics Dashboard
+1. Accounts user clicks "Analytics" in sidebar → navigates to `/analytics`
+2. Views overview stats cards (total invoices, pending, approved, rejected, paid, total amount, avg processing time)
+3. Sees interactive charts:
+   - Status distribution pie chart showing pending/approved/rejected/paid breakdown
+   - Submissions over time line chart showing 30-day trend
+   - Category breakdown pie chart (VENDOR_PAYMENT vs REIMBURSEMENT)
+4. Applies filters:
+   - Date range filter (start date, end date)
+   - Category filter (VENDOR_PAYMENT, REIMBURSEMENT, or All)
+5. Views recent high-value invoices list
+6. All charts update in real-time based on selected filters
+
 ---
 
 ## 🐛 Troubleshooting
@@ -356,9 +387,10 @@ cityflow_assignment/
 
 ## 📊 Performance
 
-- **Frontend Bundle**: ~450KB gzipped (Vite optimized)
+- **Frontend Bundle**: ~830KB gzipped (Vite optimized, includes Recharts)
 - **Backend Response Time**: <100ms for most endpoints (excluding PDF extraction)
 - **PDF Extraction**: 2-5 seconds per invoice (Gemini API call)
+- **Analytics Queries**: <200ms with proper database indexing
 - **Notification Polling**: 30-second interval (React Query)
 - **Database Queries**: Optimized with Prisma `include` for related data
 
@@ -394,7 +426,6 @@ Built as part of the Cityflo internship assignment. Designed and implemented wit
 ## 🚀 Next Steps / Future Enhancements
 
 - [ ] Two-level approval workflow (ACCOUNTS → SENIOR_ACCOUNTS)
-- [ ] Analytics dashboard with charts (Recharts)
 - [ ] Email notifications (SendGrid)
 - [ ] Webhook support for external integrations
 - [ ] Advanced duplicate detection (fuzzy matching)

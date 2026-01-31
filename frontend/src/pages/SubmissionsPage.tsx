@@ -62,6 +62,8 @@ type StatusFilter = 'ALL' | InvoiceStatus;
 const STATUS_FILTERS: { value: StatusFilter; label: string }[] = [
   { value: 'ALL', label: 'All' },
   { value: 'PENDING_REVIEW', label: 'Pending' },
+  { value: 'PENDING_SENIOR_APPROVAL', label: 'Pending Senior' },
+  { value: 'PENDING_FINAL_APPROVAL', label: 'Pending Final' },
   { value: 'APPROVED', label: 'Approved' },
   { value: 'REJECTED', label: 'Rejected' },
   { value: 'PAID', label: 'Paid' },

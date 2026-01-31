@@ -93,7 +93,7 @@ describe('UploadPage', () => {
   it('submits the form and navigates on success', async () => {
     const user = userEvent.setup();
     mockUpload.mockResolvedValueOnce({
-      invoices: [{ id: '1', submittedBy: 'u1', category: 'VENDOR_PAYMENT', status: 'PENDING_REVIEW', notes: null, filePath: 'f.pdf', originalFilename: 'test.pdf', extractionStatus: 'PENDING', isDuplicate: false, duplicateOf: null, createdAt: '', updatedAt: '' }],
+      invoices: [{ id: '1', submittedBy: 'u1', category: 'VENDOR_PAYMENT', status: 'PENDING_REVIEW', notes: null, filePath: 'f.pdf', originalFilename: 'test.pdf', extractionStatus: 'PENDING', isDuplicate: false, duplicateOf: null, requiresTwoLevel: false, seniorApprovedBy: null, seniorApprovedAt: null, createdAt: '', updatedAt: '' }],
     });
 
     render(<UploadPage />);

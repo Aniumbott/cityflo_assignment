@@ -231,7 +231,10 @@ export default function InvoiceReviewPage() {
   const status = STATUS_CONFIG[invoice.status];
   const extraction = EXTRACTION_STATUS[invoice.extractionStatus];
   const ed = invoice.extractedData;
-  const isPending = invoice.status === 'PENDING_REVIEW';
+  const isPending =
+    invoice.status === 'PENDING_REVIEW' ||
+    invoice.status === 'PENDING_SENIOR_APPROVAL' ||
+    invoice.status === 'PENDING_FINAL_APPROVAL';
   const isApproved = invoice.status === 'APPROVED';
 
   return (

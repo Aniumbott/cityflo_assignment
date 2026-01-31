@@ -74,8 +74,19 @@ router.get('/stats', async (req: AuthenticatedRequest, res: Response): Promise<v
     // Total invoices
     prisma.invoice.count({ where }),
 
-    // Status counts
-    prisma.invoice.count({ where: { ...where, status: InvoiceStatus.PENDING_REVIEW } }),
+    // Status counts (pending includes all three pending statuses)
+    prisma.invoice.count({
+      where: {
+        ...where,
+        status: {
+          in: [
+            InvoiceStatus.PENDING_REVIEW,
+            InvoiceStatus.PENDING_SENIOR_APPROVAL,
+            InvoiceStatus.PENDING_FINAL_APPROVAL,
+          ],
+        },
+      },
+    }),
     prisma.invoice.count({ where: { ...where, status: InvoiceStatus.APPROVED } }),
     prisma.invoice.count({ where: { ...where, status: InvoiceStatus.REJECTED } }),
     prisma.invoice.count({ where: { ...where, status: InvoiceStatus.PAID } }),

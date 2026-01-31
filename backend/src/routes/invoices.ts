@@ -163,11 +163,15 @@ router.post('/bulk-action', authorize(UserRole.ACCOUNTS, UserRole.SENIOR_ACCOUNT
   const auditAction = action === 'APPROVED' ? 'APPROVED' : 'REJECTED';
 
   // Update all invoices and create audit records in a transaction
+  // Note: Bulk actions only work on PENDING_REVIEW invoices to prevent
+  // bypassing the two-level approval workflow for high-value invoices.
+  // Two-level approval invoices (PENDING_SENIOR_APPROVAL, PENDING_FINAL_APPROVAL)
+  // must be approved individually through the sequential workflow.
   const result = await prisma.$transaction(async (tx) => {
     const updated = await tx.invoice.updateMany({
       where: {
         id: { in: invoiceIds },
-        status: InvoiceStatus.PENDING_REVIEW, // Only update pending invoices
+        status: InvoiceStatus.PENDING_REVIEW, // Only update PENDING_REVIEW invoices
       },
       data: { status },
     });

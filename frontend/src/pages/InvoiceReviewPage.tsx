@@ -34,6 +34,16 @@ const STATUS_CONFIG: Record<InvoiceStatus, { label: string; icon: React.ReactNod
     icon: <Clock className="h-4 w-4" />,
     classes: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
   },
+  PENDING_SENIOR_APPROVAL: {
+    label: 'Pending Senior Approval',
+    icon: <Clock className="h-4 w-4" />,
+    classes: 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400',
+  },
+  PENDING_FINAL_APPROVAL: {
+    label: 'Pending Final Approval',
+    icon: <Clock className="h-4 w-4" />,
+    classes: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
+  },
   APPROVED: {
     label: 'Approved',
     icon: <CheckCircle2 className="h-4 w-4" />,

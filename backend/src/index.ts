@@ -24,26 +24,43 @@ if (!fs.existsSync(uploadDir)) {
 // Middleware
 app.use(helmet());
 app.use(cors({
-  origin: config.frontendUrl,
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps, curl, postman)
+    if (!origin) return callback(null, true);
+
+    // Allow the configured frontend URL
+    const allowedOrigins = [
+      config.frontendUrl,
+      config.frontendUrl.replace(/\/$/, ''), // without trailing slash
+      config.frontendUrl + '/', // with trailing slash
+    ];
+
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
 }));
 app.use(morgan(config.nodeEnv === 'production' ? 'combined' : 'dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Rate limiting
+// Health check (before rate limiting to avoid blocking health checks)
+app.get('/api/health', (_req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+// Rate limiting (exclude health check)
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100,
   standardHeaders: true,
   legacyHeaders: false,
+  skip: (req) => req.path === '/api/health',
 });
 app.use('/api/', limiter);
-
-// Health check
-app.get('/api/health', (_req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
-});
 
 // Swagger API Documentation
 const openApiPath = path.resolve(__dirname, '../../openapi.yaml');

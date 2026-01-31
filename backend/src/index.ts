@@ -55,7 +55,7 @@ app.get('/api/health', (_req, res) => {
 // Rate limiting (exclude health check)
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100,
+  max: 1000,
   standardHeaders: true,
   legacyHeaders: false,
   skip: (req) => req.path === '/api/health',

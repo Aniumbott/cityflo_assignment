@@ -5,9 +5,11 @@ WORKDIR /app
 COPY package*.json ./
 COPY prisma ./prisma/
 
-RUN npm ci
+# Set placeholder DATABASE_URL for build phase
+ENV DATABASE_URL="postgresql://placeholder:placeholder@localhost:5432/placeholder"
 
-RUN npx prisma generate
+# Install dependencies (postinstall will run prisma generate)
+RUN npm ci
 
 COPY tsconfig.json ./
 COPY src ./src/
@@ -21,9 +23,11 @@ WORKDIR /app
 COPY package*.json ./
 COPY prisma ./prisma/
 
-RUN npm ci --omit=dev
+# Set placeholder DATABASE_URL for build phase
+ENV DATABASE_URL="postgresql://placeholder:placeholder@localhost:5432/placeholder"
 
-RUN npx prisma generate
+# Install production dependencies (postinstall will run prisma generate)
+RUN npm ci --omit=dev
 
 COPY --from=builder /app/dist ./dist
 
@@ -31,4 +35,5 @@ RUN mkdir -p /app/uploads
 
 EXPOSE 3000
 
-CMD ["sh", "-c", "npx prisma migrate deploy && node dist/index.js"]
+# At runtime, use actual DATABASE_URL to push schema and start server
+CMD ["sh", "-c", "npx prisma db push --skip-generate --accept-data-loss && node dist/index.js"]

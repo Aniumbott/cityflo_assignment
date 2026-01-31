@@ -12,7 +12,12 @@
       "Bash(npx tsx:*)",
       "Bash(node -e:*)",
       "Bash(npx jest --verbose)",
-      "Bash(npx jest:*)"
+      "Bash(npx jest:*)",
+      "Bash(tree:*)",
+      "Bash(npx vitest run)",
+      "Bash(npm run build:*)",
+      "Bash(npm run test:frontend:*)",
+      "Bash(npx vitest run:*)"
     ]
   }
 }

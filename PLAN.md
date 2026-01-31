@@ -20,6 +20,33 @@
 | Frontend hosting | **Vercel** (from `/frontend`) | Free tier, great for Vite/React |
 | ORM | **Prisma v5** (not v7 - v7 has breaking config changes) | Stable, well-documented |
 | DB migrations | **`prisma db push`** (not `migrate dev`) | Render free-tier PG lacks superuser for shadow DB required by migrate |
+| Theming | **Tailwind Dark Mode ('class')** | Manual toggle support + System preference |
+
+---
+
+## Design System & UI Strategy (Cityflo Aesthetic)
+
+The UI follows the "Cityflo" mobile app aesthetic: High contrast, rounded shapes, and a distinctive Yellow/Black palette. It must support **Light** and **Dark** modes seamlessly.
+
+### Color Palette Mappings
+
+| Element | Light Mode | Dark Mode | Notes |
+|---------|------------|-----------|-------|
+| **Brand Accent** | **Mustard Yellow** (`#FFC72C`) | **Mustard Yellow** (`#FFC72C`) | Primary actions, highlights. Text on top is always **Black**. |
+| **Background** | **Canvas Beige** (`#F9F9F7`) | **Midnight Black** (`#09090b`) | Main app background. |
+| **Surface/Card** | **Pure White** (`#FFFFFF`) | **Charcoal Grey** (`#18181b`) | Cards, Sidebar, Modals. |
+| **Primary Text** | **Ink Black** (`#1A1A1A`) | **Cloud White** (`#EDEDED`) | Headings, main content. |
+| **Secondary Text**| **Slate Grey** (`#64748b`) | **Ash Grey** (`#a1a1aa`) | Meta data, labels. |
+| **Borders** | **Soft Grey** (`#e2e8f0`) | **Dark Metal** (`#27272a`) | Dividers, inputs. |
+| **Success** | **Green** (`#2ECC71`) | **Neon Green** (`#4ADE80`) | Money, Approved status. |
+| **Error** | **Red** (`#E74C3C`) | **Salmon Red** (`#F87171`) | Alerts, Rejected status. |
+
+### Typography & Shapes
+*   **Font**: Inter or Roboto (Clean sans-serif).
+*   **Cards**: `rounded-2xl` (Heavy rounding), `shadow-sm`.
+*   **Inputs**: `rounded-xl`, high padding.
+*   **Buttons**: `rounded-full` or `rounded-xl`.
+*   **Visuals**: Dotted lines for timelines ("Bus Route" style).
 
 ---
 
@@ -56,336 +83,196 @@ Cascade deletes: Invoice deletion cascades to ExtractedData, LineItems, InvoiceA
 ## Implementation Phases
 
 ### Phase 1: Project Scaffolding & Setup -- COMPLETED
-
-- [x] Monorepo structure with root `package.json` (concurrently for parallel dev)
-- [x] Backend: Express + TypeScript, all dependencies installed
-- [x] Backend: Prisma v5 schema with all 6 models + enums (NOT yet migrated - needs DATABASE_URL)
-- [x] Backend: Dockerfile for Render deployment (multi-stage build, runs migrate on start)
-- [x] Backend: Jest + Supertest configured, health check test passing
-- [x] Backend: Config module loading `.env` from root then fallback to local
-- [x] Backend: Seed script for 4 default users
-- [x] Frontend: Vite + React 18 + TypeScript + Tailwind CSS v4
-- [x] Frontend: Dev proxy configured (`/api` → `localhost:3000`)
-- [x] Frontend: Boilerplate cleaned, type checks pass
-- [x] Root `.gitignore`, root `.env`, `.env.example`
-- [x] **MANUAL (DONE)**: Created Render PostgreSQL (Singapore region), external URL set in `.env`
-- [x] **MANUAL (DONE)**: Gemini API key obtained and set in `.env`
-- [x] Ran `prisma db push` to sync schema to Render PostgreSQL (used `db push` instead of `migrate dev` - Render free tier lacks superuser for shadow DB)
-- [x] Ran seed script - 4 users created (employee1, employee2, accounts1, senior_accounts1)
-
-**Key files created in Phase 1:**
-```
-.gitignore                          # Root gitignore for monorepo
-.env                                # Root env file (git-ignored)
-.env.example                        # Template
-package.json                        # Root monorepo scripts
-backend/package.json                # Backend deps & scripts
-backend/tsconfig.json               # TS config (target ES2020, commonjs)
-backend/Dockerfile                  # Multi-stage Node 20 Alpine
-backend/jest.config.js              # Jest + ts-jest config
-backend/prisma/schema.prisma        # Full DB schema (6 models, 7 enums)
-backend/prisma/seed.ts              # Seeds 4 users (2 employee, 1 accounts, 1 senior)
-backend/src/index.ts                # Express app (helmet, cors, morgan, rate-limit, health check)
-backend/src/config/index.ts         # Loads .env from root, exports config object
-backend/src/types/index.ts          # JwtPayload, AuthenticatedRequest, PaginationQuery, InvoiceFilters, ExtractionResult
-frontend/vite.config.ts             # Vite + React + Tailwind plugin + API proxy
-frontend/src/index.css              # Tailwind v4 import
-frontend/src/App.tsx                # Placeholder app component
-```
+- [x] Monorepo structure, Backend Setup, DB Schema, Docker
+- [x] Frontend Setup, Render PostgreSQL, Gemini API Key
+- [x] DB Synced and Seeded
 
 ### Phase 2: Backend - Auth & User Management -- COMPLETED
-
-- [x] `POST /api/auth/login` - validate credentials, return { accessToken, refreshToken, user }
-- [x] `POST /api/auth/refresh` - validate refresh token, return new access token
-- [x] `GET /api/auth/me` - return current user info from JWT (protected route)
-- [x] Auth middleware (`backend/src/middleware/auth.ts`) - verify JWT, attach `user` to request, handles expired/invalid tokens
-- [x] Role middleware (`backend/src/middleware/roles.ts`) - `authorize(...roles)` higher-order middleware, checks user.role against allowed roles
-- [x] Auth routes (`backend/src/routes/auth.ts`) - wired into Express app at `/api/auth`
-- [x] Tests: 14 tests covering login success/failure, missing fields, all 3 roles, refresh token flow, /me with valid/invalid/expired tokens, role middleware
-
-**Key files created/modified in Phase 2:**
-```
-backend/src/lib/prisma.ts          # Shared PrismaClient singleton (used by all route/service modules)
-backend/src/middleware/auth.ts      # JWT verification middleware (Bearer token → req.user)
-backend/src/middleware/roles.ts     # authorize(...allowedRoles) middleware factory
-backend/src/routes/auth.ts         # Login, refresh, me endpoints
-backend/src/routes/auth.test.ts    # 14 tests (login, refresh, me, roles)
-backend/src/index.ts               # (modified) wired auth routes
-backend/src/config/index.ts        # (modified) jwtExpiresIn/jwtRefreshExpiresIn changed to numeric seconds (TS compat with @types/jsonwebtoken v9)
-```
-
-**Implementation notes:**
-- JWT access token expires in 900s (15 min), refresh token in 604800s (7 days)
-- `expiresIn` uses numeric seconds (not string like '15m') due to `@types/jsonwebtoken` v9 `StringValue` branded type incompatibility with plain `string`
-- All route/service modules use a shared PrismaClient singleton (`backend/src/lib/prisma.ts`) to avoid connection pool exhaustion on Render free tier
-- Auth routes use real DB - tests run against seeded Render PostgreSQL
-- Login returns `{ accessToken, refreshToken, user: { id, email, username, role } }` (no passwordHash)
-- Role middleware is generic: `authorize(UserRole.ACCOUNTS, UserRole.SENIOR_ACCOUNTS)` - ready for Phase 3+ routes
+- [x] Login/Refresh/Me endpoints, Auth/Role middleware
+- [x] 14 Tests passing
 
 ### Phase 3: Backend - Invoice CRUD & File Upload -- COMPLETED
-
-- [x] `POST /api/invoices` - upload PDF(s) + category + notes (Multer: PDF only, 10MB max, up to 10 files)
-- [x] `GET /api/invoices` - paginated list with filters (employees=own only, accounts=all, filters: status, category, dateFrom/dateTo, submittedBy, amountMin/Max, search)
-- [x] `GET /api/invoices/:id` - single invoice with extractedData + lineItems + actions + submitter
-- [x] `GET /api/invoices/:id/pdf` - serve PDF file (stream, inline disposition)
-- [x] `PATCH /api/invoices/:id/extracted-data` - edit extracted fields + line items (ACCOUNTS/SENIOR_ACCOUNTS only, creates EDITED audit record)
-- [x] `PATCH /api/invoices/:id/status` - approve/reject/mark paid (reject requires comment, creates audit record + notification)
-- [x] `GET /api/invoices/export/csv` - export filtered invoices as CSV (ACCOUNTS/SENIOR_ACCOUNTS only)
-- [x] `POST /api/invoices/bulk-action` - bulk approve/reject with invoice IDs array (ACCOUNTS/SENIOR_ACCOUNTS only)
-- [x] Tests: 22 tests covering upload, validation, pagination, filters, detail view, access control, status changes, bulk actions, CSV export
-
-**Key files created/modified in Phase 3:**
-```
-backend/src/middleware/upload.ts     # Multer config: disk storage, PDF filter, 10MB limit, unique filenames
-backend/src/routes/invoices.ts       # All 8 invoice endpoints
-backend/src/routes/invoices.test.ts  # 22 tests
-backend/src/index.ts                 # (modified) wired invoice routes, added Multer error handling
-```
-
-**Implementation notes:**
-- Express 5 types `req.params.id` as `string | string[]` - cast to `string` throughout
-- CSV export uses `csv-writer`'s `createObjectCsvStringifier` (string output, not file)
-- Multer errors (wrong file type, size limit) caught in global error handler
-- `export/csv` route defined BEFORE `/:id` to avoid route collision
-- Bulk action only updates invoices that are currently PENDING_REVIEW
-- Extraction fires async after upload response (wired in Phase 4)
-- Status change and bulk action both create InvoiceAction audit records and Notification for submitters
-- Employee access control: employees can only see/access their own invoices (list auto-filters, detail/PDF return 403)
+- [x] Upload, List, Detail, Status, Export endpoints
+- [x] 22 Tests passing
 
 ### Phase 4: Backend - PDF Extraction via Gemini -- COMPLETED
-
-- [x] Gemini service (`backend/src/services/gemini.ts`): reads PDF as base64, sends to `gemini-2.5-flash`, structured prompt for JSON with confidence scores, strips code fences, validates structure
-- [x] Extraction service (`backend/src/services/extraction.ts`): async fire-and-forget, PENDING→PROCESSING→COMPLETED/FAILED, saves ExtractedData + LineItems, duplicate detection
-- [x] Wired into `POST /api/invoices` — extraction fires async after upload response
-- [x] Tests: 3 tests (successful extraction with mock, duplicate detection, failure handling) — Gemini mocked via jest.mock
-
-**Key files created/modified in Phase 4:**
-```
-backend/src/services/gemini.ts         # Gemini API call: PDF base64 → structured JSON extraction
-backend/src/services/extraction.ts     # Orchestrator: status updates, save to DB, duplicate detection
-backend/src/services/extraction.test.ts # 3 tests with mocked Gemini
-backend/src/routes/invoices.ts         # (modified) wired processInvoiceExtraction into POST upload
-```
-
-**Implementation notes:**
-- Model: `gemini-2.5-flash` (stable, not preview)
-- Extraction prompt requests all invoice fields + per-field confidence scores (0.0-1.0)
-- Duplicate detection: matches `invoiceNumber + vendorName` against existing extracted data, sets `isDuplicate + duplicateOf`
-- Failure handling: if Gemini or parsing fails, invoice marked FAILED, error logged, no crash
-- Invoice upload tests show expected "document has no pages" errors in logs (test PDFs are minimal stubs) — extraction gracefully marks them FAILED
+- [x] Gemini Service, Extraction Service
+- [x] 3 Tests passing
 
 ### Phase 5: Backend - Notifications & Audit Log -- COMPLETED
+- [x] Notification, Audit endpoints
+- [x] 10 Tests passing
 
-- [x] `GET /api/notifications` - paginated list for current user (includes unreadCount, invoice summary)
-- [x] `PATCH /api/notifications/:id/read` - mark single notification as read (ownership check)
-- [x] `PATCH /api/notifications/read-all` - mark all as read for current user
-- [x] `GET /api/invoices/:id/audit-log` - full audit trail (ordered by createdAt asc, includes user info)
-- [x] Tests: 10 tests covering notification list, mark read, ownership, audit log access control
+### Phase 6: Frontend - Auth & Layout -- COMPLETED
+- [x] Axios, Auth Context, Login Page
+- [x] App Shell (Sidebar/Header)
+- [x] 12 Tests passing
 
-**Key files created/modified in Phase 5:**
-```
-backend/src/routes/notifications.ts       # Notification endpoints (list, mark read, read-all)
-backend/src/routes/notifications.test.ts  # 10 tests
-backend/src/routes/invoices.ts            # (modified) added GET /:id/audit-log endpoint
-backend/src/index.ts                      # (modified) wired notification routes
-```
+### Phase 7: Frontend - Theming & Employee Views -- IN PROGRESS
 
-**Implementation notes:**
-- Audit records + notifications are created inline during status changes (Phase 3 routes) — no separate audit/notification service needed
-- Notification list includes invoice summary (id, filename, status) for frontend display
-- `read-all` endpoint defined BEFORE `/:id/read` to avoid route collision
-- Employee access control on audit-log: can only view own invoices' audit trail
+> **Design Goal:** Implement "Cityflo" design system + Dark Mode support.
 
-### Testing Notes
+- [x] **7a. Infrastructure & Theming** -- COMPLETED:
+    - [x] Updated `index.css` with Tailwind v4 `@theme` block: brand colors (#FFC72C), canvas/surface/midnight/charcoal, ink/slate/cloud/ash text, border-light/border-dark, success/error, Inter font.
+    - [x] Added `@custom-variant dark` for class-based dark mode.
+    - [x] Created `ThemeContext` (light/dark/system stored in localStorage, listens to system preference changes).
+    - [x] Created reusable UI components: `Button` (primary=yellow, secondary, ghost, danger variants), `Card` (rounded-2xl, dark mode), `ThemeToggle` (Sun/Moon/Monitor 3-way toggle).
+    - [x] Updated all Phase 6 components (LoginPage, Layout, ProtectedRoute, App.tsx) with Cityflo color tokens and `dark:` classes.
+    - [x] Header includes ThemeToggle + backdrop blur effect.
+    - [x] LoginPage uses Card component, brand-yellow submit button, ThemeToggle in corner.
+    - [x] 12 frontend tests still passing (added matchMedia mock for jsdom).
 
-- **Total: 51 tests** across 5 suites (2 health, 14 auth, 22 invoices, 3 extraction, 10 notifications/audit)
-- All tests run against the seeded Render PostgreSQL (no local DB needed)
-- Tests use the shared PrismaClient singleton (`lib/prisma.ts`) — no `$disconnect()` in individual test `afterAll` blocks
-- `jest.setTimeout(30000)` set in invoice, notification, and extraction test files to accommodate remote DB latency
-- Run with `--runInBand` to avoid connection pool exhaustion on Render free tier: `npx jest --runInBand`
+    **Key files created/modified in 7a:**
+    ```
+    frontend/src/index.css                     # (modified) @theme block with Cityflo colors + @custom-variant dark
+    frontend/src/contexts/ThemeContext.tsx      # NEW: ThemeProvider + useTheme hook (light/dark/system)
+    frontend/src/components/ui/Button.tsx       # NEW: Button with primary/secondary/ghost/danger variants
+    frontend/src/components/ui/Card.tsx         # NEW: Card with rounded-2xl + dark mode
+    frontend/src/components/ui/ThemeToggle.tsx  # NEW: 3-way theme toggle (Sun/Moon/Monitor)
+    frontend/src/pages/LoginPage.tsx            # (modified) Cityflo aesthetic + dark mode + Card/Button components
+    frontend/src/components/Layout.tsx          # (modified) Cityflo colors, rounded-xl nav, ThemeToggle in header, backdrop blur
+    frontend/src/components/ProtectedRoute.tsx  # (modified) Cityflo colors + dark mode
+    frontend/src/App.tsx                        # (modified) ThemeProvider wrapper, Cityflo colors on placeholder/404 pages
+    frontend/src/test/setup.ts                  # (modified) added matchMedia mock for jsdom
+    frontend/src/test/test-utils.tsx            # (modified) added ThemeProvider to test wrapper
+    ```
 
-### Phase 6: Frontend - Auth & Layout -- NOT STARTED
+- [x] **7b. Upload Page** -- COMPLETED:
+    - [x] **Card Container**: Uses `Card` component (bg-surface dark:bg-charcoal rounded-2xl shadow-sm).
+    - [x] **Dropzone**: `react-dropzone` with `border-dashed`, brand yellow tint on drag-active, hover highlight in both modes.
+    - [x] **Inputs**: Category `<select>` and Notes `<textarea>` — rounded-xl, `bg-white dark:bg-zinc-800 border-border-light dark:border-border-dark`, focus ring with brand color.
+    - [x] **Submit Button**: Brand Yellow via `Button` primary variant, `rounded-full`, full-width, loading spinner, disabled when no files or no category.
+    - [x] **File List**: Shows selected PDFs with name/size, remove button per file, max 10 files / 10MB each.
+    - [x] **API Integration**: `uploadInvoices()` sends multipart/form-data (files + category + notes) to `POST /api/invoices`.
+    - [x] **Success Flow**: Toast notification + navigate to `/submissions`.
+    - [x] **Error Handling**: Toast on rejection (non-PDF, >10MB), inline error on API failure.
+    - [x] **Tests**: 7 tests (render, disabled state, category select, notes input, file add/remove, submit success, error state).
+    - [x] 19 frontend tests passing (12 existing + 7 new).
 
-- [ ] Axios instance with interceptors (attach JWT, handle 401 refresh)
-- [ ] Auth context (login, logout, current user, role check)
-- [ ] Login page
-- [ ] Protected route wrapper (redirect to login if not authed)
-- [ ] App shell: sidebar navigation (different items per role), header with user info
-- [ ] Responsive: sidebar collapses on tablet
+    **Key files created/modified in 7b:**
+    ```
+    frontend/src/types/index.ts                  # (modified) Added Invoice, InvoiceCategory, InvoiceStatus, ExtractionStatus, UploadInvoicesResponse types
+    frontend/src/api/invoices.ts                 # NEW: uploadInvoices() — multipart form-data POST to /api/invoices
+    frontend/src/pages/UploadPage.tsx            # NEW: Full upload page with dropzone, category select, notes, file list, submit
+    frontend/src/pages/UploadPage.test.tsx       # NEW: 7 tests for upload page
+    frontend/src/App.tsx                         # (modified) Replaced Upload placeholder with UploadPage component
+    ```
 
-### Phase 7: Frontend - Employee Views -- NOT STARTED
+- [x] **7c. My Submissions Page** -- COMPLETED:
+    - [x] **Card Layout**: Each invoice rendered as a clickable `Card` (rounded-2xl, hover shadow), not a table.
+    - [x] **Typography**: High contrast amount display (font-semibold, ink/cloud), INR currency formatting.
+    - [x] **Status Pills**: Icon + label, rounded-full:
+        - [x] Pending: `bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400` + Clock icon.
+        - [x] Approved: `bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400` + CheckCircle icon.
+        - [x] Rejected: `bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400` + XCircle icon.
+        - [x] Paid: `bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400` + Banknote icon.
+    - [x] **Filter Pills**: Horizontal scrollable status filter tabs (All/Pending/Approved/Rejected/Paid), active = `bg-ink text-white dark:bg-cloud dark:text-black`.
+    - [x] **Search Bar**: Search by filename/vendor/invoice number, rounded-xl with Search icon.
+    - [x] **Pagination**: Previous/Next buttons with page info, 10 items per page.
+    - [x] **Empty State**: Inbox icon + "No submissions found" + Upload CTA.
+    - [x] **Error State**: "Failed to load submissions" in card.
+    - [x] **Loading State**: Brand-colored spinner.
+    - [x] **Navigation**: Upload button in header, card click navigates to `/invoices/:id`.
+    - [x] **React Query**: `useQuery` with `['submissions', page, statusFilter, search]` key for auto-refetch on filter/page change.
+    - [x] **Tests**: 8 tests (header, loading, empty, data render, filter pills, filter click, navigate, error).
+    - [x] 27 frontend tests passing (19 existing + 8 new).
 
-- [ ] **Upload Page**: drag-and-drop zone (react-dropzone), category radio (Vendor Payment / Reimbursement), notes textarea, submit with progress bar
-- [ ] **My Submissions Page**: table listing own invoices with columns: date, filename, category, status badge, amount. Click row → detail page
-- [ ] **Invoice Detail Page**: left panel = PDF viewer (iframe or embed), right panel = extracted data display, status timeline, audit log
+    **Key files created/modified in 7c:**
+    ```
+    frontend/src/types/index.ts                       # (modified) Added InvoiceListItem, Pagination, InvoiceListResponse, InvoiceListParams
+    frontend/src/api/invoices.ts                      # (modified) Added listInvoices() — GET /api/invoices with query params
+    frontend/src/pages/SubmissionsPage.tsx             # NEW: Full submissions list with cards, filters, search, pagination
+    frontend/src/pages/SubmissionsPage.test.tsx        # NEW: 8 tests for submissions page
+    frontend/src/App.tsx                              # (modified) Replaced Submissions placeholder with SubmissionsPage component
+    ```
+
+- [x] **7d. Invoice Detail (Employee View)** -- COMPLETED:
+    - [x] **Timeline**: "Bus Route" dotted line style:
+        - [x] Nodes: Circular icons per action type (Send, Eye, Pencil, CheckCircle, XCircle, Banknote).
+        - [x] Connector: `border-dashed border-l-2` vertical dotted line.
+        - [x] Colors: Action-specific colors, dark mode adapted (brand/green/red/blue/ash).
+        - [x] Shows username, action verb, timestamp, and optional comment per entry.
+    - [x] **Invoice Header**: Vendor name (or filename fallback), status pill, back button.
+    - [x] **Meta Grid**: Category, submitted date, extraction status, invoice #, invoice date, due date, payment terms, notes.
+    - [x] **Financial Summary Card**: Subtotal, tax, grand total (INR formatted, high-contrast).
+    - [x] **Line Items Table**: Responsive table with description, qty, unit price, total.
+    - [x] **Bank Details Card**: Pre-formatted bank info.
+    - [x] **Duplicate Warning**: Yellow striped alert banner when `isDuplicate` is true.
+    - [x] **Extraction Processing Indicator**: Spinner + message when extraction is pending/processing.
+    - [x] **Error/Not Found State**: AlertTriangle icon + "Go back" button.
+    - [x] **Tests**: 9 tests (loading, error, header, meta, financial, line items, bank details, timeline, duplicate warning).
+    - [x] 36 frontend tests passing (27 existing + 9 new).
+
+    **Key files created/modified in 7d:**
+    ```
+    frontend/src/types/index.ts                        # (modified) Added LineItem, ExtractedData, InvoiceActionType, InvoiceAction, InvoiceDetail, InvoiceDetailResponse
+    frontend/src/api/invoices.ts                       # (modified) Added getInvoice() — GET /api/invoices/:id
+    frontend/src/pages/InvoiceDetailPage.tsx            # NEW: Full invoice detail with meta, financials, line items, bank details, "Bus Route" timeline
+    frontend/src/pages/InvoiceDetailPage.test.tsx       # NEW: 9 tests for invoice detail page
+    frontend/src/App.tsx                               # (modified) Replaced Invoice Detail placeholder with InvoiceDetailPage component
+    ```
+
+### Phase 7: COMPLETED
+> All employee-facing views (Upload, My Submissions, Invoice Detail) are fully implemented with Cityflo design system, dark mode, and 36 passing tests.
 
 ### Phase 8: Frontend - Accounts Team Dashboard -- NOT STARTED
 
-- [ ] **All Invoices Page**: full data table with pagination, column sorting, filter panel (status multi-select, date range picker, category, employee dropdown, amount min/max)
-- [ ] **Invoice Review Page**: side-by-side layout. Left = PDF viewer. Right = editable form with extracted fields, confidence indicators (green/yellow/red), line items table. Action buttons: Approve, Reject (opens comment modal), Mark as Paid
-- [ ] **Bulk Operations**: checkbox column in table, bulk action bar appears when items selected
-- [ ] **CSV Export**: button triggers GET /api/invoices/export/csv with current filters
+- [ ] **All Invoices Dashboard**:
+    - [ ] **Filters**: Horizontal scrollable "Pills" (`bg-white dark:bg-zinc-800` -> `bg-black text-white` when active).
+    - [ ] **Data Table**:
+        - [ ] Header: `bg-zinc-50 dark:bg-zinc-900`.
+        - [ ] Rows: `hover:bg-yellow-50 dark:hover:bg-zinc-800` transition.
+- [ ] **Invoice Review Workspace**:
+    - [ ] **Review Panel**: Split screen. PDF viewer (dark mode friendly iframe) + Form.
+    - [ ] **Confidence Dots**: Green/Yellow/Red indicators next to inputs.
+    - [ ] **Action Bar**: Fixed at bottom or top-right.
+- [ ] **Bulk Operations**: Floating "Action Bar" at the bottom (Black with white text, or Dark Grey with white text).
 
-### Phase 9: Frontend - Additional Features -- NOT STARTED
+### Phase 9: Frontend - Polish & Interactivity -- NOT STARTED
 
-- [ ] **Duplicate Detection Alert**: if invoice.is_duplicate is true, show warning banner on detail/review page
-- [ ] **Audit Log View**: collapsible timeline component on invoice detail page
-- [ ] **Notifications Panel**: bell icon in header, dropdown list of notifications, mark as read
-- [ ] **Analytics Dashboard** (stretch): charts using Recharts or similar
+- [ ] **Duplicate Detection Alert**: Construction-style striped warning banner.
+- [ ] **Notification Panel**: Floating card in Header.
+- [ ] **Animations**: `framer-motion` (optional) or CSS transitions for theme switching and sidebar toggle.
 
 ### Phase 10: Polish & Deployment -- NOT STARTED
 
 - [ ] Sample test PDF invoices in `/sample-invoices`
-- [ ] Swagger/OpenAPI docs at `/api/docs`
-- [ ] README.md with setup instructions, architecture explanation, screenshots
-- [ ] **MANUAL**: Deploy backend to Render (Docker, set root dir to `/backend`)
-- [ ] **MANUAL**: Deploy frontend to Vercel (set root dir to `/frontend`, set `VITE_API_URL`)
-- [ ] **MANUAL**: Set all env vars on Render dashboard
-- [ ] End-to-end verification on deployed version
+- [ ] Swagger/OpenAPI docs
+- [ ] README.md
+- [ ] **MANUAL**: Deploy backend to Render
+- [ ] **MANUAL**: Deploy frontend to Vercel
+- [ ] End-to-end verification
+
+---
+
+## Folder Structure Update (Frontend)
+
+```
+cityflow_assignment/
+├── ...
+├── frontend/
+│   ├── src/
+│   │   ├── contexts/
+│   │   │   ├── ThemeContext.tsx    # Manages light/dark mode state
+│   │   │   └── ...
+│   │   ├── components/
+│   │   │   ├── ui/                 # Reusable Styled Components
+│   │   │   │   ├── Button.tsx      # Variants: primary (yellow), secondary (black/white)
+│   │   │   │   ├── Card.tsx        # rounded-2xl, supports dark mode
+│   │   │   │   └── ThemeToggle.tsx # Sun/Moon switch
+│   │   ├── ...
+```
 
 ---
 
 ## Additional Features
 
 ### Priority (Implementing these 4):
-1. **Duplicate Detection** - check invoice_number + vendor on extraction complete, set is_duplicate flag, UI shows warning
-2. **Audit Log** - all actions tracked in invoice_actions table, displayed as timeline on invoice detail
-3. **Bulk Operations** - checkbox selection on accounts dashboard, bulk approve/reject endpoint
-4. **OCR Confidence Score** - Gemini returns confidence per field in structured output, UI color-codes: green (>0.8), yellow (0.5-0.8), red (<0.5)
+1. **Duplicate Detection** - Warning banner on review page.
+2. **Audit Log** - **Visualized as a "Bus Route" vertical timeline.**
+3. **Bulk Operations** - Floating bottom bar.
+4. **OCR Confidence Score** - Color-coded indicators.
 
 ### Stretch (if time permits):
-5. **Approval Workflow** - two-level approval for invoices above threshold (SENIOR_ACCOUNTS role exists in schema)
-6. **Analytics Dashboard** - charts for weekly/monthly totals, avg processing time, category breakdown, top vendors
-
----
-
-## Folder Structure
-
-```
-cityflow_assignment/
-├── .gitignore                 # Root gitignore for monorepo
-├── .env                       # Shared env vars (git-ignored)
-├── .env.example               # Template for .env
-├── package.json               # Root scripts: dev, test:backend, prisma:migrate, etc.
-├── PLAN.md                    # THIS FILE - golden reference
-├── backend/
-│   ├── Dockerfile             # Multi-stage Node 20 Alpine, runs prisma migrate on start
-│   ├── package.json           # Backend deps (express, prisma, jwt, gemini, multer, etc.)
-│   ├── tsconfig.json          # TypeScript config (ES2020, commonjs)
-│   ├── jest.config.js         # Jest + ts-jest
-│   ├── prisma/
-│   │   ├── schema.prisma      # 6 models, 7 enums, PostgreSQL
-│   │   └── seed.ts            # Seeds 4 users
-│   └── src/
-│       ├── index.ts           # Express app entry (middleware, health check, error handler)
-│       ├── index.test.ts      # Health check test (passing)
-│       ├── config/
-│       │   └── index.ts       # Loads .env from root + local, exports config object
-│       ├── lib/
-│       │   └── prisma.ts      # Shared PrismaClient singleton (avoids connection pool exhaustion)
-│       ├── middleware/
-│       │   ├── auth.ts        # JWT verification middleware (Phase 2)
-│       │   ├── roles.ts       # Role-based access middleware (Phase 2)
-│       │   └── upload.ts      # Multer config: PDF filter, 10MB limit (Phase 3)
-│       ├── routes/
-│       │   ├── auth.ts            # Auth routes (Phase 2)
-│       │   ├── auth.test.ts       # 14 auth tests (Phase 2)
-│       │   ├── invoices.ts        # Invoice CRUD routes (Phase 3)
-│       │   ├── invoices.test.ts   # 22 invoice tests (Phase 3)
-│       │   ├── notifications.ts   # Notification routes (Phase 5)
-│       │   └── notifications.test.ts # 10 notification/audit tests (Phase 5)
-│       ├── services/
-│       │   ├── gemini.ts          # Gemini API call (Phase 4)
-│       │   ├── extraction.ts      # Orchestrates extraction + duplicate check (Phase 4)
-│       │   └── extraction.test.ts # 3 extraction tests (Phase 4)
-│       ├── utils/
-│       └── types/
-│           └── index.ts       # Shared types (JwtPayload, AuthenticatedRequest, etc.)
-├── frontend/
-│   ├── package.json           # Frontend deps (react, router, query, axios, tailwind, etc.)
-│   ├── tsconfig.json          # Vite TS config
-│   ├── vite.config.ts         # Vite + React + Tailwind v4 + API proxy to :3000
-│   └── src/
-│       ├── main.tsx           # React entry point
-│       ├── index.css          # Tailwind v4 (@import "tailwindcss")
-│       ├── App.tsx            # Placeholder (will become router in Phase 6)
-│       ├── api/               # Axios instance + API functions (Phase 6+)
-│       ├── components/        # Reusable components (Phase 6+)
-│       ├── pages/             # Page components (Phase 6+)
-│       ├── contexts/          # AuthContext (Phase 6)
-│       ├── hooks/             # Custom hooks (Phase 6+)
-│       ├── types/             # Shared frontend types (Phase 6+)
-│       └── utils/             # Helpers (Phase 6+)
-└── sample-invoices/           # Test PDFs for demo (Phase 10)
-```
-
----
-
-## Seed Users
-
-| Username | Password | Role | Email |
-|----------|----------|------|-------|
-| employee1 | password123 | EMPLOYEE | employee1@cityflo.com |
-| employee2 | password123 | EMPLOYEE | employee2@cityflo.com |
-| accounts1 | password123 | ACCOUNTS | accounts1@cityflo.com |
-| senior_accounts1 | password123 | SENIOR_ACCOUNTS | senior.accounts@cityflo.com |
-
----
-
-## Manual Steps Required
-
-| Step | When | Status | Instructions |
-|------|------|--------|--------------|
-| Create Render PostgreSQL | Before Phase 2 | DONE | Render PostgreSQL (Singapore region), external URL in `.env` |
-| Get Gemini API key | Before Phase 4 | DONE | Key set in `.env` as GEMINI_API_KEY |
-| Run Prisma db push | After DATABASE_URL set | DONE | `prisma db push` (not migrate - Render free tier limitation) |
-| Run seed script | After db push | DONE | 4 users seeded successfully |
-| Deploy backend to Render | Phase 10 | NOT DONE | Render → New → Web Service → Docker → Root dir: `backend` → Set env vars |
-| Deploy frontend to Vercel | Phase 10 | NOT DONE | Vercel → Import repo → Root dir: `frontend` → Set VITE_API_URL |
-| Set production env vars | Phase 10 | NOT DONE | Set DATABASE_URL, JWT_SECRET, JWT_REFRESH_SECRET, GEMINI_API_KEY, FRONTEND_URL on Render |
-
----
-
-## Environment Variables
-
-Single `.env` file at project root (git-ignored). See `.env.example` for template.
-
-```env
-# Backend
-DATABASE_URL=postgresql://user:pass@host:5432/dbname
-JWT_SECRET=your-secret-key-min-32-chars
-JWT_REFRESH_SECRET=your-refresh-secret-min-32-chars
-GEMINI_API_KEY=your-gemini-api-key
-UPLOAD_DIR=./uploads
-PORT=3000
-FRONTEND_URL=http://localhost:5173
-NODE_ENV=development
-
-# Frontend (VITE_ prefix required for Vite to expose to client)
-VITE_API_URL=http://localhost:3000/api
-```
-
-> On Render/Vercel, env vars are set via their dashboards - no `.env` file needed in production.
-
----
-
-## NPM Scripts Reference
-
-**From project root:**
-- `npm run dev` - starts both backend and frontend concurrently
-- `npm run dev:backend` - starts backend only (tsx watch)
-- `npm run dev:frontend` - starts frontend only (vite dev)
-- `npm run test:backend` - runs backend Jest tests
-- `npm run prisma:migrate` - runs Prisma migration (loads root .env)
-- `npm run prisma:seed` - seeds the database
-- `npm run prisma:studio` - opens Prisma Studio GUI
-
-**From `/backend`:**
-- `npm run dev` - tsx watch src/index.ts
-- `npm run build` - tsc compile to dist/
-- `npm test` - jest
-- `npm run prisma:generate` - generate Prisma client
-
-**From `/frontend`:**
-- `npm run dev` - vite dev server on :5173
-- `npm run build` - vite build to dist/
+5. **Approval Workflow** - Two-level approval.
+6. **Analytics Dashboard** - Charts (Recharts) with Cityflo Yellow palette.
